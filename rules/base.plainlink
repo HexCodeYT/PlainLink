@@ -1,0 +1,31 @@
+# PlainLink base rules v0.
+#
+# Rule values are comma-separated parameter names.
+# A trailing * means "prefix match", so utm_* removes utm_source, utm_medium, etc.
+
+[global]
+remove = utm_*, fbclid, gclid, dclid, msclkid, mc_cid, mc_eid, igshid, vero_id
+
+[domain:youtu.be]
+remove = si
+
+[domain:youtube.com]
+remove = si, feature
+keep = v, list, t
+
+[domain:open.spotify.com]
+remove = si
+
+[domain:instagram.com]
+remove = igsh, igshid
+
+[domain:tiktok.com]
+remove = _r, _t, tt_from
+
+[domain:amazon.com]
+remove = ascsubtag, tag, pd_rd_*, pf_rd_*, qid, sprefix
+keep = th, psc
+
+[domain:amazon.com.au]
+remove = ascsubtag, tag, pd_rd_*, pf_rd_*, qid, sprefix
+keep = th, psc
