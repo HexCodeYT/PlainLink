@@ -21,6 +21,7 @@ PlainLink is early MVP software.
 
 - Cleans URLs from the CLI with `plainlink clean`.
 - Explains removed parameters with `plainlink inspect`.
+- Restores the last cleaned original URL with `plainlink restore`.
 - Watches the macOS clipboard with `plainlink watch`.
 - Uses conservative rules that preserve unknown parameters by default.
 
@@ -30,6 +31,7 @@ PlainLink is early MVP software.
 cargo test
 cargo run -- clean 'https://youtu.be/LYa_ReqRlcs?si=VC4qVB_EUC90uwbo'
 cargo run -- inspect 'https://example.com/read?utm_source=newsletter&id=42'
+cargo run -- restore
 ```
 
 Expected output:
@@ -51,6 +53,7 @@ src/
   cleaner.rs      URL cleaning engine
   rules.rs        PlainLink rule parser and matcher
   clipboard.rs    macOS clipboard watcher adapter
+  state.rs        Last-cleaned URL restore state
   main.rs         CLI entrypoint
 rules/
   base.plainlink  Default community rules

@@ -8,12 +8,14 @@ flowchart TB
         Watch["Clipboard watcher"]
         Read["Read text"]
         Write["Write cleaned text"]
+        Restore["Restore original"]
     end
 
     subgraph Core["Rust Core"]
         Parse["Parse URL shape"]
         Match["Match rules"]
         Rebuild["Rebuild URL"]
+        State["Last-cleaned state"]
     end
 
     subgraph Community["Community Rules"]
@@ -21,7 +23,9 @@ flowchart TB
         Tests["Engine tests"]
     end
 
-    Watch --> Read --> Parse --> Match --> Rebuild --> Write
+    Watch --> Read --> Parse --> Match --> Rebuild --> State --> Write
+    Restore --> State
+    Restore --> Write
     Base --> Match
     Tests --> Core
 ```
@@ -42,6 +46,7 @@ sequenceDiagram
     Core->>Rules: ask removal reason per parameter
     Rules-->>Core: remove or keep
     Core-->>Watcher: cleaned URL + removed params
+    Watcher->>Core: save original URL for restore
     Watcher->>Clipboard: Replace with cleaned URL
 ```
 
@@ -50,6 +55,7 @@ sequenceDiagram
 - The Rust core owns URL cleaning, rule parsing, and tests.
 - The macOS adapter only reads and writes clipboard text.
 - Unknown parameters are kept by default.
+- The original URL is stored before PlainLink rewrites the clipboard.
 - Root is not required; clipboard access belongs to the logged-in user session.
 - The MVP uses `pbpaste` and `pbcopy` for a small macOS adapter. A future native menu bar app can reuse the same core.
 
