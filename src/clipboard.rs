@@ -1,4 +1,6 @@
-use crate::{RuleSet, clean_url, save_last_cleaned};
+use crate::RuleSet;
+#[cfg(target_os = "macos")]
+use crate::{clean_url, save_last_cleaned};
 use std::time::Duration;
 
 #[derive(Debug, Clone, Copy)]
