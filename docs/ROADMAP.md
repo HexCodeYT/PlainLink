@@ -7,6 +7,7 @@
 - macOS clipboard watcher.
 - Restore last original URL.
 - User LaunchAgent install/status/restart/uninstall.
+- Stable user install/uninstall and doctor checks.
 - Human-readable default rules.
 - Fixture-backed rule QA.
 - Contributor docs with Mermaid diagrams.
