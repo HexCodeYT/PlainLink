@@ -1,6 +1,6 @@
 #[cfg(target_os = "macos")]
 use crate::agent::{self, AgentInstallOptions, AgentStatus};
-#[cfg(any(target_os = "macos", test))]
+#[cfg(target_os = "macos")]
 use std::path::Path;
 use std::path::PathBuf;
 
