@@ -1,4 +1,6 @@
-use plainlink::{RuleSet, WatchOptions, clean_url, watch_clipboard};
+use plainlink::{
+    RuleSet, WatchOptions, clean_url, read_last_cleaned, watch_clipboard, write_clipboard_text,
+};
 use std::{env, process, time::Duration};
 
 fn main() {
@@ -23,6 +25,7 @@ fn run() -> Result<(), String> {
         }
         Some("clean") => clean_command(args.collect()),
         Some("inspect") => inspect_command(args.collect()),
+        Some("restore") => restore_command(),
         Some("watch") => watch_command(args.collect()),
         Some(other) => Err(format!("unknown command `{other}`. Try `plainlink help`.")),
     }
@@ -68,6 +71,20 @@ fn watch_command(args: Vec<String>) -> Result<(), String> {
     );
 
     watch_clipboard(&rules, options).map_err(|error| error.to_string())
+}
+
+fn restore_command() -> Result<(), String> {
+    let last_cleaned = read_last_cleaned().map_err(|error| {
+        format!("could not read last cleaned URL: {error}. Run `plainlink watch` first.")
+    })?;
+
+    write_clipboard_text(&last_cleaned.original)
+        .map_err(|error| format!("could not restore original URL to clipboard: {error}"))?;
+
+    println!("Restored original URL to clipboard:");
+    println!("{}", last_cleaned.original.trim());
+
+    Ok(())
 }
 
 fn parse_watch_options(args: Vec<String>) -> Result<WatchOptions, String> {
@@ -117,6 +134,7 @@ fn print_help() {
 Usage:
   plainlink clean <url>       Print a cleaned URL
   plainlink inspect <url>     Show what PlainLink removed and why
+  plainlink restore           Restore the last cleaned URL to the clipboard
   plainlink watch [options]   Watch and clean the macOS clipboard
 
 Watch options:

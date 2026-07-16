@@ -17,8 +17,23 @@ flowchart LR
     Changed -->|Yes| Clean["Clean URL"]
     Clean --> Different{"Changed?"}
     Different -->|No| Sleep
-    Different -->|Yes| Copy["Write with pbcopy"]
+    Different -->|Yes| State["Store original URL"]
+    State --> Copy["Write with pbcopy"]
     Copy --> Sleep
+```
+
+## Restore
+
+When `plainlink watch` cleans a URL, it stores the original at:
+
+```text
+~/Library/Application Support/PlainLink/last-cleaned.json
+```
+
+Restore the last original URL to the clipboard:
+
+```sh
+cargo run -- restore
 ```
 
 ## LaunchAgent Example

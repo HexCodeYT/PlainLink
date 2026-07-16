@@ -5,13 +5,13 @@
 - Rust URL cleaning core.
 - CLI commands for cleaning and inspection.
 - macOS clipboard watcher.
+- Restore last original URL.
 - Human-readable default rules.
 - Contributor docs with Mermaid diagrams.
 
 ## Next
 
 - Add a native macOS menu bar shell.
-- Store the last original URL for one-click restore.
 - Add rule fixture tests loaded from files.
 - Add signed release builds.
 - Add optional remote ruleset updates with clear privacy controls.

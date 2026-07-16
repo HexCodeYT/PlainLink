@@ -1,4 +1,4 @@
-use crate::{RuleSet, clean_url};
+use crate::{RuleSet, clean_url, save_last_cleaned};
 use std::time::Duration;
 
 #[derive(Debug, Clone, Copy)]
@@ -56,10 +56,11 @@ pub fn watch_clipboard(_rules: &RuleSet, _options: WatchOptions) -> std::io::Res
 fn clean_clipboard_text(input: &str, rules: &RuleSet) -> std::io::Result<Option<String>> {
     let result = clean_url(input, rules);
 
-    if !result.changed() {
+    if result.removed.is_empty() {
         return Ok(None);
     }
 
+    save_last_cleaned(&result)?;
     write_clipboard_text(&result.cleaned)?;
     println!(
         "cleaned {} parameter(s): {}",
@@ -71,7 +72,7 @@ fn clean_clipboard_text(input: &str, rules: &RuleSet) -> std::io::Result<Option<
 }
 
 #[cfg(target_os = "macos")]
-fn read_clipboard_text() -> std::io::Result<String> {
+pub fn read_clipboard_text() -> std::io::Result<String> {
     use std::process::Command;
 
     let output = Command::new("pbpaste").arg("-Prefer").arg("txt").output()?;
@@ -84,7 +85,7 @@ fn read_clipboard_text() -> std::io::Result<String> {
 }
 
 #[cfg(target_os = "macos")]
-fn write_clipboard_text(value: &str) -> std::io::Result<()> {
+pub fn write_clipboard_text(value: &str) -> std::io::Result<()> {
     use std::io::Write;
     use std::process::{Command, Stdio};
 
@@ -102,4 +103,20 @@ fn write_clipboard_text(value: &str) -> std::io::Result<()> {
     }
 
     Ok(())
+}
+
+#[cfg(not(target_os = "macos"))]
+pub fn read_clipboard_text() -> std::io::Result<String> {
+    Err(std::io::Error::new(
+        std::io::ErrorKind::Unsupported,
+        "clipboard reading is currently implemented for macOS only",
+    ))
+}
+
+#[cfg(not(target_os = "macos"))]
+pub fn write_clipboard_text(_value: &str) -> std::io::Result<()> {
+    Err(std::io::Error::new(
+        std::io::ErrorKind::Unsupported,
+        "clipboard writing is currently implemented for macOS only",
+    ))
 }
