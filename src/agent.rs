@@ -1,4 +1,6 @@
-use std::path::{Path, PathBuf};
+#[cfg(any(target_os = "macos", test))]
+use std::path::Path;
+use std::path::PathBuf;
 
 pub const LABEL: &str = "com.plainlink.agent";
 
@@ -123,6 +125,7 @@ fn unsupported<T>() -> std::io::Result<T> {
     ))
 }
 
+#[cfg(any(target_os = "macos", test))]
 fn validate_options(options: AgentInstallOptions) -> std::io::Result<()> {
     if options.interval_ms < 100 {
         return Err(std::io::Error::new(
@@ -134,6 +137,7 @@ fn validate_options(options: AgentInstallOptions) -> std::io::Result<()> {
     Ok(())
 }
 
+#[cfg(any(target_os = "macos", test))]
 fn render_launch_agent_plist(executable: &Path, log_dir: &Path, interval_ms: u64) -> String {
     let executable = xml_escape(&executable.to_string_lossy());
     let stdout = xml_escape(&log_dir.join("agent.out.log").to_string_lossy());
@@ -176,6 +180,7 @@ fn render_launch_agent_plist(executable: &Path, log_dir: &Path, interval_ms: u64
     )
 }
 
+#[cfg(any(target_os = "macos", test))]
 fn xml_escape(input: &str) -> String {
     input
         .replace('&', "&amp;")
