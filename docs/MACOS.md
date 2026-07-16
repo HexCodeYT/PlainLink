@@ -38,10 +38,25 @@ cargo run -- restore
 
 ## LaunchAgent Example
 
-Build and install the binary somewhere stable, then adapt [packaging/macos/com.plainlink.agent.example.plist](../packaging/macos/com.plainlink.agent.example.plist).
+Build the binary, then install the watcher as a user LaunchAgent:
 
 ```sh
 cargo build --release
+target/release/plainlink agent install --interval-ms 500
 ```
 
-For a real release, the app should provide a menu bar shell with an enable/disable toggle, restore-last-original action, and autostart management.
+PlainLink writes the LaunchAgent plist to:
+
+```text
+~/Library/LaunchAgents/com.plainlink.agent.plist
+```
+
+Manage the service:
+
+```sh
+plainlink agent status
+plainlink agent restart
+plainlink agent uninstall
+```
+
+The generated plist is based on [packaging/macos/com.plainlink.agent.example.plist](../packaging/macos/com.plainlink.agent.example.plist). For a real release, the app should provide a menu bar shell with an enable/disable toggle and restore-last-original action.

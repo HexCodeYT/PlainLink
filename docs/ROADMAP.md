@@ -6,6 +6,7 @@
 - CLI commands for cleaning and inspection.
 - macOS clipboard watcher.
 - Restore last original URL.
+- User LaunchAgent install/status/restart/uninstall.
 - Human-readable default rules.
 - Contributor docs with Mermaid diagrams.
 

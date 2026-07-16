@@ -1,5 +1,7 @@
 use plainlink::{
-    RuleSet, WatchOptions, clean_url, read_last_cleaned, watch_clipboard, write_clipboard_text,
+    AgentInstallOptions, AgentStatus, RuleSet, WatchOptions, agent_status, clean_url,
+    install_agent, read_last_cleaned, restart_agent, uninstall_agent, watch_clipboard,
+    write_clipboard_text,
 };
 use std::{env, process, time::Duration};
 
@@ -23,6 +25,7 @@ fn run() -> Result<(), String> {
             println!("plainlink {}", env!("CARGO_PKG_VERSION"));
             Ok(())
         }
+        Some("agent") => agent_command(args.collect()),
         Some("clean") => clean_command(args.collect()),
         Some("inspect") => inspect_command(args.collect()),
         Some("restore") => restore_command(),
@@ -87,6 +90,84 @@ fn restore_command() -> Result<(), String> {
     Ok(())
 }
 
+fn agent_command(args: Vec<String>) -> Result<(), String> {
+    let Some(command) = args.first().map(String::as_str) else {
+        print_agent_help();
+        return Ok(());
+    };
+
+    match command {
+        "-h" | "--help" | "help" => {
+            print_agent_help();
+            Ok(())
+        }
+        "install" => {
+            let options = parse_agent_install_options(&args[1..])?;
+            let path = install_agent(options)
+                .map_err(|error| format!("could not install LaunchAgent: {error}"))?;
+            println!("Installed and started PlainLink LaunchAgent:");
+            println!("{}", path.display());
+            Ok(())
+        }
+        "uninstall" => {
+            let path = uninstall_agent()
+                .map_err(|error| format!("could not uninstall LaunchAgent: {error}"))?;
+            println!("Uninstalled PlainLink LaunchAgent:");
+            println!("{}", path.display());
+            Ok(())
+        }
+        "status" => {
+            let status = agent_status()
+                .map_err(|error| format!("could not inspect LaunchAgent: {error}"))?;
+            println!("PlainLink LaunchAgent is {}.", status.label());
+
+            if status == AgentStatus::Installed {
+                println!("Run `plainlink agent restart` to load it.");
+            }
+
+            Ok(())
+        }
+        "restart" => {
+            let path = restart_agent()
+                .map_err(|error| format!("could not restart LaunchAgent: {error}"))?;
+            println!("Restarted PlainLink LaunchAgent:");
+            println!("{}", path.display());
+            Ok(())
+        }
+        other => Err(format!(
+            "unknown agent command `{other}`. Try `plainlink agent help`."
+        )),
+    }
+}
+
+fn parse_agent_install_options(args: &[String]) -> Result<AgentInstallOptions, String> {
+    let mut options = AgentInstallOptions::default();
+    let mut index = 0;
+
+    while index < args.len() {
+        match args[index].as_str() {
+            "--interval-ms" => {
+                let Some(value) = args.get(index + 1) else {
+                    return Err("--interval-ms needs a number".to_string());
+                };
+                let milliseconds = value
+                    .parse::<u64>()
+                    .map_err(|_| "--interval-ms needs a positive integer".to_string())?;
+
+                if milliseconds < 100 {
+                    return Err("--interval-ms must be at least 100".to_string());
+                }
+
+                options.interval_ms = milliseconds;
+                index += 2;
+            }
+            other => return Err(format!("unknown agent install option `{other}`")),
+        }
+    }
+
+    Ok(options)
+}
+
 fn parse_watch_options(args: Vec<String>) -> Result<WatchOptions, String> {
     let mut options = WatchOptions::default();
     let mut index = 0;
@@ -132,6 +213,7 @@ fn print_help() {
         r#"PlainLink - clean copied links before you share them.
 
 Usage:
+  plainlink agent <command>   Manage the macOS LaunchAgent
   plainlink clean <url>       Print a cleaned URL
   plainlink inspect <url>     Show what PlainLink removed and why
   plainlink restore           Restore the last cleaned URL to the clipboard
@@ -141,10 +223,33 @@ Watch options:
   --interval-ms <ms>          Polling interval, default 500
   --clean-current             Clean the current clipboard once at startup
 
+Agent commands:
+  install [--interval-ms ms]  Install and start the user LaunchAgent
+  uninstall                   Stop and remove the user LaunchAgent
+  status                      Show LaunchAgent state
+  restart                     Reload the installed LaunchAgent
+
 Examples:
+  plainlink agent install --interval-ms 500
   plainlink clean 'https://youtu.be/LYa_ReqRlcs?si=VC4qVB_EUC90uwbo'
   plainlink inspect 'https://example.com/?utm_source=newsletter&id=42'
   plainlink watch --interval-ms 500
+"#
+    );
+}
+
+fn print_agent_help() {
+    println!(
+        r#"PlainLink LaunchAgent management
+
+Usage:
+  plainlink agent install [--interval-ms ms]
+  plainlink agent uninstall
+  plainlink agent status
+  plainlink agent restart
+
+Options:
+  --interval-ms <ms>          Polling interval for the watcher, default 500
 "#
     );
 }
