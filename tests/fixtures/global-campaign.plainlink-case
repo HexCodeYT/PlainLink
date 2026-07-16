@@ -1,0 +1,4 @@
+name = remove generic campaign tracking
+input = https://example.com/read?utm_source=newsletter&id=42&fbclid=abc#comments
+expected = https://example.com/read?id=42#comments
+removed = utm_source, fbclid

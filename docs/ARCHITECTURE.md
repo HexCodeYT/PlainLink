@@ -21,7 +21,8 @@ flowchart TB
 
     subgraph Community["Community Rules"]
         Base["rules/base.plainlink"]
-        Tests["Engine tests"]
+        Fixtures["tests/fixtures"]
+        Tests["Fixture-backed tests"]
     end
 
     Agent --> Watch
@@ -29,6 +30,7 @@ flowchart TB
     Restore --> State
     Restore --> Write
     Base --> Match
+    Fixtures --> Tests
     Tests --> Core
 ```
 
@@ -59,6 +61,7 @@ sequenceDiagram
 - Unknown parameters are kept by default.
 - The original URL is stored before PlainLink rewrites the clipboard.
 - LaunchAgent commands install and control the user-level watcher process.
+- Community rule examples live as fixtures and run through `cargo test`.
 - Root is not required; clipboard access belongs to the logged-in user session.
 - The MVP uses `pbpaste` and `pbcopy` for a small macOS adapter. A future native menu bar app can reuse the same core.
 

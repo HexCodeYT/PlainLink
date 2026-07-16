@@ -1,0 +1,4 @@
+name = keep amazon product options while removing affiliate tracking
+input = https://www.amazon.com/dp/B08N5WRWNW?tag=affiliate-20&psc=1&pd_rd_w=abc
+expected = https://www.amazon.com/dp/B08N5WRWNW?psc=1
+removed = tag, pd_rd_w

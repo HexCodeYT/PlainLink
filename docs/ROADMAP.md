@@ -8,12 +8,12 @@
 - Restore last original URL.
 - User LaunchAgent install/status/restart/uninstall.
 - Human-readable default rules.
+- Fixture-backed rule QA.
 - Contributor docs with Mermaid diagrams.
 
 ## Next
 
 - Add a native macOS menu bar shell.
-- Add rule fixture tests loaded from files.
 - Add signed release builds.
 - Add optional remote ruleset updates with clear privacy controls.
 

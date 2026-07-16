@@ -1,0 +1,4 @@
+name = preserve unknown required parameters
+input = https://example.com/reset?token=abc&utm_medium=email
+expected = https://example.com/reset?token=abc
+removed = utm_medium

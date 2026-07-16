@@ -1,0 +1,4 @@
+name = remove youtube short share token
+input = https://youtu.be/LYa_ReqRlcs?si=VC4qVB_EUC90uwbo
+expected = https://youtu.be/LYa_ReqRlcs
+removed = si

@@ -1,0 +1,4 @@
+name = remove spotify share token
+input = https://open.spotify.com/track/abc123?si=share-token&context=artist
+expected = https://open.spotify.com/track/abc123?context=artist
+removed = si
