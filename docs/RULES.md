@@ -57,3 +57,16 @@ Before: https://example.com/read?utm_source=newsletter&id=42
 After:  https://example.com/read?id=42
 Rule:   [global] remove = utm_*
 ```
+
+## Fixture Tests
+
+Every new rule should include a fixture in `tests/fixtures/`.
+
+```text
+name = remove youtube short share token
+input = https://youtu.be/LYa_ReqRlcs?si=VC4qVB_EUC90uwbo
+expected = https://youtu.be/LYa_ReqRlcs
+removed = si
+```
+
+The fixture runner executes during `cargo test`. It checks the cleaned URL and the exact removed parameter list.

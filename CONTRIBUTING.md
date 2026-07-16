@@ -7,6 +7,7 @@ PlainLink should be easy to audit, easy to test, and boring in the best way. A c
 ```sh
 cargo fmt --check
 cargo test
+cargo clippy --all-targets -- -D warnings
 cargo run -- inspect 'https://example.com/?utm_source=newsletter&id=42'
 ```
 
@@ -19,7 +20,8 @@ Every rule proposal should include:
 - a real-looking before URL,
 - the expected after URL,
 - the reason each removed parameter is tracking-related,
-- confirmation that required parameters still work.
+- confirmation that required parameters still work,
+- a fixture in `tests/fixtures/`.
 
 Good contribution:
 
@@ -27,6 +29,15 @@ Good contribution:
 Before: https://youtu.be/LYa_ReqRlcs?si=VC4qVB_EUC90uwbo
 After:  https://youtu.be/LYa_ReqRlcs
 Why:    YouTube share tracking token; video id is in the path.
+```
+
+Fixture:
+
+```text
+name = remove youtube short share token
+input = https://youtu.be/LYa_ReqRlcs?si=VC4qVB_EUC90uwbo
+expected = https://youtu.be/LYa_ReqRlcs
+removed = si
 ```
 
 Risky contribution:
@@ -42,4 +53,5 @@ PlainLink preserves unknown parameters by default because invite links, signed d
 - Keep the engine platform-independent.
 - Put OS-specific clipboard behavior behind small adapters.
 - Prefer explicit tests over clever matching.
+- Add or update fixtures for rule behavior changes.
 - Do not add network behavior without a privacy-focused design note.

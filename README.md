@@ -24,6 +24,7 @@ PlainLink is early MVP software.
 - Restores the last cleaned original URL with `plainlink restore`.
 - Watches the macOS clipboard with `plainlink watch`.
 - Installs PlainLink as a user LaunchAgent with `plainlink agent install`.
+- Validates community rule behavior with fixture-backed tests.
 - Uses conservative rules that preserve unknown parameters by default.
 
 ## Quick Start
@@ -66,6 +67,8 @@ src/
   main.rs         CLI entrypoint
 rules/
   base.plainlink  Default community rules
+tests/
+  fixtures/       Rule behavior fixtures used by cargo test
 docs/
   ARCHITECTURE.md System design and data flow
   RULES.md        Rule syntax and contribution guidance
@@ -79,6 +82,6 @@ Rules are intentionally readable. A rule PR should include:
 - the dirty URL,
 - the expected cleaned URL,
 - why the parameter is safe to remove,
-- a test when the behavior changes the engine.
+- a fixture in `tests/fixtures/`.
 
 Start with [CONTRIBUTING.md](CONTRIBUTING.md), then read [docs/RULES.md](docs/RULES.md).
