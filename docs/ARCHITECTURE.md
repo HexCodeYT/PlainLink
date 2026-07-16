@@ -5,6 +5,7 @@ PlainLink has two jobs: detect copied URLs and clean them without breaking usefu
 ```mermaid
 flowchart TB
     subgraph Platform["Platform Adapter"]
+        Agent["LaunchAgent manager"]
         Watch["Clipboard watcher"]
         Read["Read text"]
         Write["Write cleaned text"]
@@ -23,6 +24,7 @@ flowchart TB
         Tests["Engine tests"]
     end
 
+    Agent --> Watch
     Watch --> Read --> Parse --> Match --> Rebuild --> State --> Write
     Restore --> State
     Restore --> Write
@@ -56,6 +58,7 @@ sequenceDiagram
 - The macOS adapter only reads and writes clipboard text.
 - Unknown parameters are kept by default.
 - The original URL is stored before PlainLink rewrites the clipboard.
+- LaunchAgent commands install and control the user-level watcher process.
 - Root is not required; clipboard access belongs to the logged-in user session.
 - The MVP uses `pbpaste` and `pbcopy` for a small macOS adapter. A future native menu bar app can reuse the same core.
 
