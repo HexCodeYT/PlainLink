@@ -1,0 +1,14 @@
+[package]
+name = "plainlink"
+version = "0.1.0"
+edition = "2024"
+description = "Clean copied links before you share them."
+license = "MIT"
+
+[lib]
+name = "plainlink"
+path = "src/lib.rs"
+
+[[bin]]
+name = "plainlink"
+path = "src/main.rs"
