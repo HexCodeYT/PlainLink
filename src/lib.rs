@@ -14,7 +14,7 @@ pub use agent::{
     AgentInstallOptions, AgentStatus, agent_status, install_agent, restart_agent, uninstall_agent,
 };
 pub use cleaner::{CleanResult, RemovedParam, clean_url};
-pub use clipboard::{WatchOptions, watch_clipboard, write_clipboard_text};
+pub use clipboard::{WatchOptions, clean_clipboard_once, watch_clipboard, write_clipboard_text};
 pub use install::{
     DoctorCheck, DoctorStatus, InstallOptions, InstallReport, UninstallOptions, UninstallReport,
     install_plainlink, run_doctor, uninstall_plainlink,
