@@ -259,7 +259,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         }
 
         menu.addItem(makeItem(toggleTitle, action: #selector(toggleCleaning), isEnabled: !isWorking))
-        menu.addItem(makeItem("Restart Watcher", action: #selector(restartWatcher), isEnabled: !isWorking && watcherStatus != .notInstalled))
+        menu.addItem(makeItem("Restart Watcher", action: #selector(restartWatcher), isEnabled: !isWorking && canRestartWatcher))
         menu.addItem(NSMenuItem.separator())
 
         menu.addItem(makeItem("Clean Current Clipboard", action: #selector(cleanCurrentClipboard), isEnabled: !isWorking))
@@ -335,6 +335,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         return parent
     }
 
+    private var canRestartWatcher: Bool {
+        watcherStatus == .running || watcherStatus == .installed
+    }
+
     private func refreshStatus() {
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self else {
@@ -364,19 +368,27 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     @objc private func toggleCleaning() {
         switch watcherStatus {
         case .running:
-            runCommand(title: "Pause Cleaning", arguments: ["agent", "uninstall"]) { _ in }
+            runCommand(title: "Pause Cleaning", arguments: ["agent", "uninstall"]) { [weak self] result in
+                self?.showResultIfFailed(title: "Pause Cleaning", result: result)
+            }
         case .installed:
-            runCommand(title: "Start Cleaning", arguments: ["agent", "restart"]) { _ in }
+            runCommand(title: "Start Cleaning", arguments: ["agent", "restart"]) { [weak self] result in
+                self?.showResultIfFailed(title: "Start Cleaning", result: result)
+            }
         case .notInstalled, .unknown:
             runCommand(
                 title: "Enable Cleaning",
                 arguments: ["install", "--interval-ms", "\(selectedInterval)"]
-            ) { _ in }
+            ) { [weak self] result in
+                self?.showResultIfFailed(title: "Enable Cleaning", result: result)
+            }
         }
     }
 
     @objc private func restartWatcher() {
-        runCommand(title: "Restart Watcher", arguments: ["agent", "restart"]) { _ in }
+        runCommand(title: "Restart Watcher", arguments: ["agent", "restart"]) { [weak self] result in
+            self?.showResultIfFailed(title: "Restart Watcher", result: result)
+        }
     }
 
     @objc private func cleanCurrentClipboard() {
@@ -441,7 +453,9 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
             runCommand(
                 title: "Update Interval",
                 arguments: ["install", "--interval-ms", "\(interval)"]
-            ) { _ in }
+            ) { [weak self] result in
+                self?.showResultIfFailed(title: "Update Interval", result: result)
+            }
         } else {
             rebuildMenu()
         }
@@ -475,14 +489,15 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
             DispatchQueue.main.async {
                 self?.isWorking = false
                 completion(result)
-
-                if !result.succeeded {
-                    self?.showCommandResult(title: title, result: result)
-                }
-
                 self?.refreshStatus()
                 self?.rebuildMenu()
             }
+        }
+    }
+
+    private func showResultIfFailed(title: String, result: CommandResult) {
+        if !result.succeeded {
+            showCommandResult(title: title, result: result)
         }
     }
 
