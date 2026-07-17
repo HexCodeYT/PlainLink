@@ -34,12 +34,20 @@ impl AgentStatus {
 
 #[cfg(target_os = "macos")]
 pub fn install_agent(options: AgentInstallOptions) -> std::io::Result<PathBuf> {
+    let executable = std::env::current_exe()?;
+    install_agent_for_executable(options, &executable)
+}
+
+#[cfg(target_os = "macos")]
+pub fn install_agent_for_executable(
+    options: AgentInstallOptions,
+    executable: &Path,
+) -> std::io::Result<PathBuf> {
     validate_options(options)?;
 
     let plist_path = launch_agent_path()?;
     let log_dir = log_dir()?;
-    let executable = std::env::current_exe()?;
-    let plist = render_launch_agent_plist(&executable, &log_dir, options.interval_ms);
+    let plist = render_launch_agent_plist(executable, &log_dir, options.interval_ms);
 
     if let Some(parent) = plist_path.parent() {
         std::fs::create_dir_all(parent)?;

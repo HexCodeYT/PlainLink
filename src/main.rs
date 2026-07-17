@@ -1,6 +1,7 @@
 use plainlink::{
-    AgentInstallOptions, AgentStatus, RuleSet, WatchOptions, agent_status, clean_url,
-    install_agent, read_last_cleaned, restart_agent, uninstall_agent, watch_clipboard,
+    AgentInstallOptions, AgentStatus, DoctorStatus, InstallOptions, RuleSet, UninstallOptions,
+    WatchOptions, agent_status, clean_url, install_agent, install_plainlink, read_last_cleaned,
+    restart_agent, run_doctor, uninstall_agent, uninstall_plainlink, watch_clipboard,
     write_clipboard_text,
 };
 use std::{env, process, time::Duration};
@@ -27,8 +28,11 @@ fn run() -> Result<(), String> {
         }
         Some("agent") => agent_command(args.collect()),
         Some("clean") => clean_command(args.collect()),
+        Some("doctor") => doctor_command(),
+        Some("install") => install_command(args.collect()),
         Some("inspect") => inspect_command(args.collect()),
         Some("restore") => restore_command(),
+        Some("uninstall") => uninstall_command(args.collect()),
         Some("watch") => watch_command(args.collect()),
         Some(other) => Err(format!("unknown command `{other}`. Try `plainlink help`.")),
     }
@@ -90,6 +94,60 @@ fn restore_command() -> Result<(), String> {
     Ok(())
 }
 
+fn install_command(args: Vec<String>) -> Result<(), String> {
+    let options = parse_install_options(&args)?;
+    let report = install_plainlink(options)
+        .map_err(|error| format!("could not install PlainLink: {error}"))?;
+
+    println!("Installed PlainLink binary:");
+    println!("{}", report.binary_path.display());
+    println!("Installed and started LaunchAgent:");
+    println!("{}", report.plist_path.display());
+
+    Ok(())
+}
+
+fn uninstall_command(args: Vec<String>) -> Result<(), String> {
+    let options = parse_uninstall_options(&args)?;
+    let report = uninstall_plainlink(options)
+        .map_err(|error| format!("could not uninstall PlainLink: {error}"))?;
+
+    println!("Removed PlainLink LaunchAgent:");
+    println!("{}", report.plist_path.display());
+    println!("Removed PlainLink binary:");
+    println!("{}", report.binary_path.display());
+
+    if report.purged {
+        println!("Purged PlainLink support and log directories.");
+    }
+
+    Ok(())
+}
+
+fn doctor_command() -> Result<(), String> {
+    let checks = run_doctor().map_err(|error| format!("could not run doctor: {error}"))?;
+    let has_failures = checks
+        .iter()
+        .any(|check| check.status == DoctorStatus::Fail);
+
+    println!("PlainLink doctor");
+
+    for check in checks {
+        println!(
+            "[{}] {}: {}",
+            check.status.marker(),
+            check.name,
+            check.detail
+        );
+    }
+
+    if has_failures {
+        println!("Doctor found blocking issues.");
+    }
+
+    Ok(())
+}
+
 fn agent_command(args: Vec<String>) -> Result<(), String> {
     let Some(command) = args.first().map(String::as_str) else {
         print_agent_help();
@@ -138,6 +196,30 @@ fn agent_command(args: Vec<String>) -> Result<(), String> {
             "unknown agent command `{other}`. Try `plainlink agent help`."
         )),
     }
+}
+
+fn parse_install_options(args: &[String]) -> Result<InstallOptions, String> {
+    let agent_options = parse_agent_install_options(args)?;
+    Ok(InstallOptions {
+        interval_ms: agent_options.interval_ms,
+    })
+}
+
+fn parse_uninstall_options(args: &[String]) -> Result<UninstallOptions, String> {
+    let mut options = UninstallOptions::default();
+    let mut index = 0;
+
+    while index < args.len() {
+        match args[index].as_str() {
+            "--purge" => {
+                options.purge = true;
+                index += 1;
+            }
+            other => return Err(format!("unknown uninstall option `{other}`")),
+        }
+    }
+
+    Ok(options)
 }
 
 fn parse_agent_install_options(args: &[String]) -> Result<AgentInstallOptions, String> {
@@ -215,8 +297,11 @@ fn print_help() {
 Usage:
   plainlink agent <command>   Manage the macOS LaunchAgent
   plainlink clean <url>       Print a cleaned URL
+  plainlink doctor            Check install health
+  plainlink install [options] Install PlainLink to a stable user path
   plainlink inspect <url>     Show what PlainLink removed and why
   plainlink restore           Restore the last cleaned URL to the clipboard
+  plainlink uninstall         Remove installed PlainLink files
   plainlink watch [options]   Watch and clean the macOS clipboard
 
 Watch options:
@@ -229,7 +314,13 @@ Agent commands:
   status                      Show LaunchAgent state
   restart                     Reload the installed LaunchAgent
 
+Install options:
+  --interval-ms <ms>          Polling interval for the watcher, default 500
+  --purge                    With uninstall, remove support and log directories
+
 Examples:
+  plainlink install --interval-ms 500
+  plainlink doctor
   plainlink agent install --interval-ms 500
   plainlink clean 'https://youtu.be/LYa_ReqRlcs?si=VC4qVB_EUC90uwbo'
   plainlink inspect 'https://example.com/?utm_source=newsletter&id=42'

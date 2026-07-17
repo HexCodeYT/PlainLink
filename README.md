@@ -23,6 +23,7 @@ PlainLink is early MVP software.
 - Explains removed parameters with `plainlink inspect`.
 - Restores the last cleaned original URL with `plainlink restore`.
 - Watches the macOS clipboard with `plainlink watch`.
+- Installs PlainLink to a stable user path with `plainlink install`.
 - Installs PlainLink as a user LaunchAgent with `plainlink agent install`.
 - Validates community rule behavior with fixture-backed tests.
 - Uses conservative rules that preserve unknown parameters by default.
@@ -34,6 +35,7 @@ cargo test
 cargo run -- clean 'https://youtu.be/LYa_ReqRlcs?si=VC4qVB_EUC90uwbo'
 cargo run -- inspect 'https://example.com/read?utm_source=newsletter&id=42'
 cargo run -- restore
+cargo run -- doctor
 cargo run -- agent status
 ```
 
@@ -49,10 +51,10 @@ To watch the macOS clipboard:
 cargo run -- watch --interval-ms 500
 ```
 
-To install the watcher as a user LaunchAgent:
+To install PlainLink to a stable user path and start the watcher:
 
 ```sh
-cargo run -- agent install --interval-ms 500
+cargo run -- install --interval-ms 500
 ```
 
 ## Project Layout
@@ -61,6 +63,7 @@ cargo run -- agent install --interval-ms 500
 src/
   agent.rs        macOS LaunchAgent management
   cleaner.rs      URL cleaning engine
+  install.rs      Stable user install and doctor checks
   rules.rs        PlainLink rule parser and matcher
   clipboard.rs    macOS clipboard watcher adapter
   state.rs        Last-cleaned URL restore state
