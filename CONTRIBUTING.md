@@ -11,6 +11,12 @@ cargo clippy --all-targets -- -D warnings
 cargo run -- inspect 'https://example.com/?utm_source=newsletter&id=42'
 ```
 
+For macOS menu bar app changes:
+
+```sh
+scripts/test-macos-app.sh
+```
+
 ## Rule Contributions
 
 Add default rules in [rules/base.plainlink](rules/base.plainlink). Keep them conservative.
@@ -52,6 +58,8 @@ PlainLink preserves unknown parameters by default because invite links, signed d
 
 - Keep the engine platform-independent.
 - Put OS-specific clipboard behavior behind small adapters.
+- Keep the macOS menu bar app thin; it should call the CLI instead of duplicating core logic.
 - Prefer explicit tests over clever matching.
 - Add or update fixtures for rule behavior changes.
+- Add or update app bundle smoke tests when changing menu app packaging.
 - Do not add network behavior without a privacy-focused design note.
