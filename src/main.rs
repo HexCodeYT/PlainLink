@@ -1,8 +1,8 @@
 use plainlink::{
     AgentInstallOptions, AgentStatus, DoctorStatus, InstallOptions, RuleSet, UninstallOptions,
-    WatchOptions, agent_status, clean_url, install_agent, install_plainlink, read_last_cleaned,
-    restart_agent, run_doctor, uninstall_agent, uninstall_plainlink, watch_clipboard,
-    write_clipboard_text,
+    WatchOptions, agent_status, clean_clipboard_once, clean_url, install_agent, install_plainlink,
+    read_last_cleaned, restart_agent, run_doctor, uninstall_agent, uninstall_plainlink,
+    watch_clipboard, write_clipboard_text,
 };
 use std::{env, process, time::Duration};
 
@@ -28,6 +28,7 @@ fn run() -> Result<(), String> {
         }
         Some("agent") => agent_command(args.collect()),
         Some("clean") => clean_command(args.collect()),
+        Some("clean-clipboard") => clean_clipboard_command(),
         Some("doctor") => doctor_command(),
         Some("install") => install_command(args.collect()),
         Some("inspect") => inspect_command(args.collect()),
@@ -44,6 +45,25 @@ fn clean_command(args: Vec<String>) -> Result<(), String> {
     let result = clean_url(&input, &rules);
 
     println!("{}", result.cleaned);
+    Ok(())
+}
+
+fn clean_clipboard_command() -> Result<(), String> {
+    let rules = RuleSet::default_rules();
+    let result = clean_clipboard_once(&rules)
+        .map_err(|error| format!("could not clean current clipboard: {error}"))?;
+
+    match result {
+        Some(result) => {
+            println!(
+                "Cleaned clipboard URL and removed {} parameter(s):",
+                result.removed.len()
+            );
+            println!("{}", result.cleaned);
+        }
+        None => println!("Clipboard already clean."),
+    }
+
     Ok(())
 }
 
@@ -297,6 +317,7 @@ fn print_help() {
 Usage:
   plainlink agent <command>   Manage the macOS LaunchAgent
   plainlink clean <url>       Print a cleaned URL
+  plainlink clean-clipboard   Clean the current clipboard once
   plainlink doctor            Check install health
   plainlink install [options] Install PlainLink to a stable user path
   plainlink inspect <url>     Show what PlainLink removed and why
@@ -321,6 +342,7 @@ Install options:
 Examples:
   plainlink install --interval-ms 500
   plainlink doctor
+  plainlink clean-clipboard
   plainlink agent install --interval-ms 500
   plainlink clean 'https://youtu.be/LYa_ReqRlcs?si=VC4qVB_EUC90uwbo'
   plainlink inspect 'https://example.com/?utm_source=newsletter&id=42'

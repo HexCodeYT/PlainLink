@@ -5,6 +5,7 @@
 - Rust URL cleaning core.
 - CLI commands for cleaning and inspection.
 - macOS clipboard watcher.
+- Native macOS menu bar app.
 - Restore last original URL.
 - User LaunchAgent install/status/restart/uninstall.
 - Stable user install/uninstall and doctor checks.
@@ -14,8 +15,9 @@
 
 ## Next
 
-- Add a native macOS menu bar shell.
 - Add signed release builds.
+- Add a downloadable app artifact.
+- Add clearer first-run onboarding inside the menu bar app.
 - Add optional remote ruleset updates with clear privacy controls.
 
 ## Later
@@ -23,4 +25,4 @@
 - Windows and Linux clipboard adapters.
 - Community rules registry.
 - Rule linter for pull requests.
-- Browser/WASM experiment using the same Rust core.
+- Native tray apps for supported desktop platforms.

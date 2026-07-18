@@ -1,10 +1,11 @@
 # PlainLink Architecture
 
-PlainLink has two jobs: detect copied URLs and clean them without breaking useful links. The MVP keeps those jobs separate so contributors can improve rules and engine behavior without touching macOS clipboard code.
+PlainLink has two jobs: detect copied URLs and clean them without breaking useful links. The MVP keeps those jobs separate so contributors can improve rules and engine behavior without touching macOS UI or clipboard code.
 
 ```mermaid
 flowchart TB
     subgraph Platform["Platform Adapter"]
+        Menu["macOS menu bar app"]
         Install["Stable installer"]
         Agent["LaunchAgent manager"]
         Watch["Clipboard watcher"]
@@ -26,11 +27,18 @@ flowchart TB
         Tests["Fixture-backed tests"]
     end
 
+    Menu --> Install
+    Menu --> Agent
+    Menu --> Restore
+    Menu --> Doctor["Doctor checks"]
+    Menu --> OneShot["Clean current clipboard"]
     Install --> Agent
     Agent --> Watch
     Watch --> Read --> Parse --> Match --> Rebuild --> State --> Write
+    OneShot --> Read
     Restore --> State
     Restore --> Write
+    Doctor --> Agent
     Base --> Match
     Fixtures --> Tests
     Tests --> Core
@@ -41,11 +49,14 @@ flowchart TB
 ```mermaid
 sequenceDiagram
     participant User
+    participant Menu as PlainLink.app
     participant Clipboard
     participant Watcher as plainlink watch
     participant Core as URL cleaner
     participant Rules as RuleSet
 
+    User->>Menu: Enable cleaning
+    Menu->>Watcher: Install/start LaunchAgent
     User->>Clipboard: Copy tracked URL
     Watcher->>Clipboard: Poll text
     Watcher->>Core: clean_url(text, rules)
@@ -59,14 +70,16 @@ sequenceDiagram
 ## Design Choices
 
 - The Rust core owns URL cleaning, rule parsing, and tests.
+- The menu bar app owns user-facing controls and shells out to the CLI.
 - The macOS adapter only reads and writes clipboard text.
 - Unknown parameters are kept by default.
 - The original URL is stored before PlainLink rewrites the clipboard.
 - The stable installer copies the binary before pointing LaunchAgent at it.
 - LaunchAgent commands install and control the user-level watcher process.
+- System-level clipboard cleaning is the product surface; browser extensions are not required for the core app.
 - Community rule examples live as fixtures and run through `cargo test`.
 - Root is not required; clipboard access belongs to the logged-in user session.
-- The MVP uses `pbpaste` and `pbcopy` for a small macOS adapter. A future native menu bar app can reuse the same core.
+- The MVP uses `pbpaste` and `pbcopy` for a small macOS adapter.
 
 ## Future Shape
 
@@ -76,5 +89,7 @@ flowchart LR
     Core --> Mac["macOS menu bar app"]
     Core --> Win["Windows tray app"]
     Core --> Linux["Linux tray app"]
-    Core --> WASM["Browser/WASM experiments"]
+    Mac --> Agent["macOS LaunchAgent"]
+    Win --> WinWatch["Windows clipboard watcher"]
+    Linux --> LinuxWatch["Linux clipboard watcher"]
 ```

@@ -1,6 +1,6 @@
 use crate::RuleSet;
 #[cfg(target_os = "macos")]
-use crate::{clean_url, save_last_cleaned};
+use crate::{CleanResult, clean_url, save_last_cleaned};
 use std::time::Duration;
 
 #[derive(Debug, Clone, Copy)]
@@ -19,15 +19,29 @@ impl Default for WatchOptions {
 }
 
 #[cfg(target_os = "macos")]
+pub fn clean_clipboard_once(rules: &RuleSet) -> std::io::Result<Option<CleanResult>> {
+    let current = read_clipboard_text()?;
+    write_cleaned_clipboard_text(&current, rules)
+}
+
+#[cfg(not(target_os = "macos"))]
+pub fn clean_clipboard_once(_rules: &RuleSet) -> std::io::Result<Option<crate::CleanResult>> {
+    Err(std::io::Error::new(
+        std::io::ErrorKind::Unsupported,
+        "clipboard cleaning is currently implemented for macOS only",
+    ))
+}
+
+#[cfg(target_os = "macos")]
 pub fn watch_clipboard(rules: &RuleSet, options: WatchOptions) -> std::io::Result<()> {
     use std::thread;
 
     let mut last_seen = read_clipboard_text().unwrap_or_default();
 
     if options.clean_current
-        && let Some(cleaned) = clean_clipboard_text(&last_seen, rules)?
+        && let Some(result) = write_cleaned_clipboard_text(&last_seen, rules)?
     {
-        last_seen = cleaned;
+        last_seen = result.cleaned;
     }
 
     loop {
@@ -38,8 +52,8 @@ pub fn watch_clipboard(rules: &RuleSet, options: WatchOptions) -> std::io::Resul
             continue;
         }
 
-        if let Some(cleaned) = clean_clipboard_text(&current, rules)? {
-            last_seen = cleaned;
+        if let Some(result) = write_cleaned_clipboard_text(&current, rules)? {
+            last_seen = result.cleaned;
         } else {
             last_seen = current;
         }
@@ -55,7 +69,10 @@ pub fn watch_clipboard(_rules: &RuleSet, _options: WatchOptions) -> std::io::Res
 }
 
 #[cfg(target_os = "macos")]
-fn clean_clipboard_text(input: &str, rules: &RuleSet) -> std::io::Result<Option<String>> {
+fn write_cleaned_clipboard_text(
+    input: &str,
+    rules: &RuleSet,
+) -> std::io::Result<Option<CleanResult>> {
     let result = clean_url(input, rules);
 
     if result.removed.is_empty() {
@@ -70,7 +87,7 @@ fn clean_clipboard_text(input: &str, rules: &RuleSet) -> std::io::Result<Option<
         result.cleaned
     );
 
-    Ok(Some(result.cleaned))
+    Ok(Some(result))
 }
 
 #[cfg(target_os = "macos")]

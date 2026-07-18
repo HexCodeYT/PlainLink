@@ -2,12 +2,13 @@
 
 Clean copied links before you share them.
 
-PlainLink is a local-first URL cleaner. The MVP is a Rust command line tool with a portable cleaning engine and a macOS clipboard watcher. The project goal is to become a community-maintained, ad-blocker-list-style ruleset for removing tracking parameters from copied URLs.
+PlainLink is a local-first URL cleaner. The MVP is a Rust command line tool with a portable cleaning engine, a macOS clipboard watcher, and a native macOS menu bar app. The project goal is to become a community-maintained, ad-blocker-list-style ruleset for removing tracking parameters from copied URLs at the system clipboard level.
 
 ```mermaid
 flowchart LR
     Copy["User copies a URL"] --> Clipboard["macOS clipboard"]
-    Clipboard --> Watcher["plainlink watch"]
+    Menu["PlainLink menu bar app"] --> Watcher["plainlink watch"]
+    Clipboard --> Watcher
     Watcher --> Engine["plainlink-core"]
     Engine --> Rules["rules/base.plainlink"]
     Rules --> Engine
@@ -23,6 +24,8 @@ PlainLink is early MVP software.
 - Explains removed parameters with `plainlink inspect`.
 - Restores the last cleaned original URL with `plainlink restore`.
 - Watches the macOS clipboard with `plainlink watch`.
+- Cleans the current clipboard once with `plainlink clean-clipboard`.
+- Provides a native macOS menu bar app built with Apple Command Line Tools.
 - Installs PlainLink to a stable user path with `plainlink install`.
 - Installs PlainLink as a user LaunchAgent with `plainlink agent install`.
 - Validates community rule behavior with fixture-backed tests.
@@ -34,6 +37,7 @@ PlainLink is early MVP software.
 cargo test
 cargo run -- clean 'https://youtu.be/LYa_ReqRlcs?si=VC4qVB_EUC90uwbo'
 cargo run -- inspect 'https://example.com/read?utm_source=newsletter&id=42'
+cargo run -- clean-clipboard
 cargo run -- restore
 cargo run -- doctor
 cargo run -- agent status
@@ -57,9 +61,19 @@ To install PlainLink to a stable user path and start the watcher:
 cargo run -- install --interval-ms 500
 ```
 
+To build and smoke-test the native macOS menu bar app:
+
+```sh
+scripts/test-macos-app.sh
+```
+
+This creates `dist/PlainLink.app`.
+
 ## Project Layout
 
 ```text
+app/
+  macos/PlainLinkMenu  Swift/AppKit menu bar app
 src/
   agent.rs        macOS LaunchAgent management
   cleaner.rs      URL cleaning engine
@@ -76,6 +90,10 @@ docs/
   ARCHITECTURE.md System design and data flow
   RULES.md        Rule syntax and contribution guidance
   MACOS.md        LaunchAgent notes
+  MENUBAR.md      Native menu bar app notes
+scripts/
+  build-macos-app.sh  Build dist/PlainLink.app
+  test-macos-app.sh   Build and smoke-test the app bundle
 ```
 
 ## Contributing
