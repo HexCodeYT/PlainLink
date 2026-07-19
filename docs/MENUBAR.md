@@ -32,6 +32,28 @@ scripts/test-macos-app.sh
 
 This builds the bundle, validates `Info.plist`, confirms both executables exist, runs the menu app smoke test, and checks the embedded CLI version command.
 
+## Package
+
+```sh
+scripts/package-macos-app.sh
+```
+
+The package script rebuilds and smoke-tests the app, then writes:
+
+```text
+dist/packages/PlainLink-<version>-macos-<arch>.zip
+dist/packages/PlainLink-<version>-macos-<arch>.zip.sha256
+```
+
+The zip is unsigned and not notarized. It is meant for MVP testing and GitHub Actions artifacts.
+
+Verify a downloaded package:
+
+```sh
+cd dist/packages
+shasum -a 256 -c PlainLink-<version>-macos-<arch>.zip.sha256
+```
+
 ## Runtime Flow
 
 ```mermaid

@@ -10,6 +10,8 @@ fn macos_menu_app_assets_are_wired() {
         fs::read_to_string("scripts/build-macos-app.sh").expect("build script should exist");
     let test_script =
         fs::read_to_string("scripts/test-macos-app.sh").expect("test script should exist");
+    let package_script =
+        fs::read_to_string("scripts/package-macos-app.sh").expect("package script should exist");
 
     for command in [
         "install",
@@ -36,4 +38,9 @@ fn macos_menu_app_assets_are_wired() {
     assert!(build_script.contains("-module-cache-path"));
     assert!(test_script.contains("--smoke-test"));
     assert!(test_script.contains("plutil -lint"));
+    assert!(package_script.contains("scripts/test-macos-app.sh"));
+    assert!(package_script.contains("ditto -c -k --sequesterRsrc --keepParent"));
+    assert!(package_script.contains("shasum -a 256"));
+    assert!(package_script.contains("ARTIFACT_NAME="));
+    assert!(package_script.contains("macos-$ARCH.zip"));
 }

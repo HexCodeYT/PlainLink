@@ -26,3 +26,37 @@ jobs:
 
       - name: Run clippy
         run: cargo clippy --all-targets -- -D warnings
+
+  macos-app:
+    name: macOS app package
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust components
+        run: rustup component add rustfmt clippy
+
+      - name: Check formatting
+        run: cargo fmt --check
+
+      - name: Run tests
+        run: cargo test
+
+      - name: Run clippy
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Build and smoke-test menu bar app
+        run: scripts/test-macos-app.sh
+
+      - name: Package menu bar app
+        run: scripts/package-macos-app.sh
+
+      - name: Upload app package
+        uses: actions/upload-artifact@v4
+        with:
+          name: plainlink-macos-app
+          path: |
+            dist/packages/*.zip
+            dist/packages/*.sha256

@@ -9,6 +9,7 @@
 - Restore last original URL.
 - User LaunchAgent install/status/restart/uninstall.
 - Stable user install/uninstall and doctor checks.
+- Unsigned macOS release packaging.
 - Human-readable default rules.
 - Fixture-backed rule QA.
 - Contributor docs with Mermaid diagrams.
@@ -16,7 +17,7 @@
 ## Next
 
 - Add signed release builds.
-- Add a downloadable app artifact.
+- Publish downloadable app artifacts from GitHub Actions.
 - Add clearer first-run onboarding inside the menu bar app.
 - Add optional remote ruleset updates with clear privacy controls.
 
