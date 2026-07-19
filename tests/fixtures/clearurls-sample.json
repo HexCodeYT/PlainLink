@@ -1,0 +1,40 @@
+{
+  "providers": {
+    "Video Example": {
+      "urlPattern": "^https?://(?:[a-z0-9-]+\\.)*?video\\.example\\.com",
+      "completeProvider": false,
+      "rules": [
+        "si",
+        "utm_source",
+        "unsafe(rule)"
+      ],
+      "referralMarketing": [
+        "tag"
+      ]
+    },
+    "News Example": {
+      "urlPattern": "^https?://(?:www\\.)?news\\.example\\.com",
+      "completeProvider": false,
+      "rules": [
+        "pk_.*"
+      ]
+    },
+    "Skipped With Exception": {
+      "urlPattern": "^https?://(?:[a-z0-9-]+\\.)*?shop\\.example\\.com",
+      "completeProvider": false,
+      "rules": [
+        "ref"
+      ],
+      "exceptions": [
+        "^https?://shop\\.example\\.com/checkout"
+      ]
+    },
+    "Skipped Wildcard Tld": {
+      "urlPattern": "^https?://(?:[a-z0-9-]+\\.)*?wildcard\\.(?:[a-z]{2,}){1,}",
+      "completeProvider": false,
+      "rules": [
+        "clid"
+      ]
+    }
+  }
+}

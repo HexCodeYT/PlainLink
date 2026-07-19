@@ -70,3 +70,15 @@ removed = si
 ```
 
 The fixture runner executes during `cargo test`. It checks the cleaned URL and the exact removed parameter list.
+
+## External Source Importers
+
+PlainLink keeps `.plainlink` as the runtime format, even when rules come from external ecosystems. Importers compile source-specific formats into generated `.plainlink` files:
+
+```sh
+cargo run --bin plainlink-rules -- import-clearurls \
+  --input clearurls-data.minify.json \
+  --output rules/generated/clearurls.plainlink
+```
+
+Generated third-party rules should not be committed by default until source licensing and attribution have been reviewed. See [RULE_SOURCES.md](RULE_SOURCES.md).

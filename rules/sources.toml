@@ -1,0 +1,33 @@
+# External rule sources that PlainLink can compile into .plainlink files.
+#
+# PlainLink does not vendor generated third-party rules by default. Treat these
+# sources as inputs for local or CI compilation until redistribution terms are
+# reviewed for each source.
+
+[[source]]
+id = "clearurls"
+kind = "clearurls-json"
+name = "ClearURLs Rules"
+url = "https://rules2.clearurls.xyz/data.minify.json"
+hash_url = "https://rules2.clearurls.xyz/rules.minify.hash"
+homepage = "https://docs.clearurls.xyz/1.23.0/specs/rules/"
+license = "verify upstream ClearURLs rules license before redistributing generated rules"
+vendor_generated_rules = false
+
+[[source]]
+id = "easylist"
+kind = "adblock-removeparam"
+name = "EasyList / EasyPrivacy"
+homepage = "https://easylist.to/pages/licence.html"
+license = "GPL-3.0-or-later OR CC-BY-SA-3.0-or-later for EasyList repository content unless otherwise noted"
+vendor_generated_rules = false
+status = "planned"
+
+[[source]]
+id = "firefox-query-stripping"
+kind = "firefox-query-stripping"
+name = "Firefox Query Parameter Stripping"
+url = "https://firefox.settings.services.mozilla.com/v1/buckets/main/collections/query-stripping/records"
+homepage = "https://firefox-source-docs.mozilla.org/toolkit/components/antitracking/anti-tracking/query-stripping/index.html"
+vendor_generated_rules = false
+status = "planned"
