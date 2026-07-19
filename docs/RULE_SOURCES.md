@@ -9,6 +9,9 @@ flowchart LR
     Firefox["Firefox query stripping"] --> Compiler
     Local["PlainLink additions"] --> Compiler
     Compiler --> Generated["generated .plainlink"]
+    Compiler --> Manifest["import manifest"]
+    Generated --> Gate["verify-fixtures"]
+    Base["rules/base.plainlink"] --> Gate
     Generated --> Runtime["PlainLink CLI / app"]
 ```
 
@@ -19,7 +22,9 @@ The first importer supports a conservative ClearURLs subset:
 ```sh
 plainlink-rules import-clearurls \
   --input clearurls-data.minify.json \
-  --output rules/generated/clearurls.plainlink
+  --output rules/generated/clearurls.plainlink \
+  --manifest rules/generated/clearurls.manifest \
+  --source-revision <upstream-sha>
 ```
 
 It imports only providers that can be represented safely in `.plainlink`:
@@ -39,6 +44,41 @@ It skips:
 - parameter regexes that cannot be represented as exact or prefix rules.
 
 That makes the importer incomplete by design, but safe. It is better to import fewer rules than to over-clean checkout, login, redirect, invite, or signed URLs.
+
+## Safety Gate
+
+Generated source rules need two checks before they can ship:
+
+```sh
+plainlink-rules verify-fixtures
+plainlink-rules verify-fixtures --rules rules/generated/clearurls.plainlink
+```
+
+The first command proves native rules still satisfy the fixture corpus. The second command merges generated rules with native rules and fails on any fixture regression.
+
+Each import can also write a deterministic manifest:
+
+```text
+source_name = ClearURLs Rules
+source_url = https://rules2.clearurls.xyz/data.minify.json
+source_revision = <upstream-sha>
+input_sha256 = <sha256>
+output_sha256 = <sha256>
+providers_seen = 184
+providers_imported = 121
+providers_skipped = 63
+rules_imported = 846
+rules_skipped = 392
+
+[skip_reasons]
+exceptions = 12
+wildcard_tld = 8
+complete_provider = 2
+unsupported_domain_regex = 31
+unsupported_param_regex = 392
+```
+
+The manifest is for releases, CI logs, and review. It records exactly which upstream input produced the generated `.plainlink` output and why unsupported rules were rejected.
 
 ## Source Metadata
 

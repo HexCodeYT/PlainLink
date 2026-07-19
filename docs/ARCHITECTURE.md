@@ -26,8 +26,10 @@ flowchart TB
         Sources["rules/sources.toml"]
         Importers["plainlink-rules importers"]
         Generated["generated .plainlink"]
+        Manifest["import manifest"]
         Fixtures["tests/fixtures"]
-        Tests["Fixture-backed tests"]
+        Gate["plainlink-rules verify-fixtures"]
+        Tests["cargo test"]
     end
 
     Menu --> Install
@@ -44,9 +46,12 @@ flowchart TB
     Doctor --> Agent
     Sources --> Importers
     Importers --> Generated
+    Importers --> Manifest
+    Generated --> Gate
     Generated --> Match
     Base --> Match
-    Fixtures --> Tests
+    Fixtures --> Gate
+    Gate --> Tests
     Tests --> Core
 ```
 
@@ -84,6 +89,8 @@ sequenceDiagram
 - LaunchAgent commands install and control the user-level watcher process.
 - System-level clipboard cleaning is the product surface; browser extensions are not required for the core app.
 - External rule importers run at build or contributor time and emit `.plainlink`; the runtime does not understand external list formats.
+- Import manifests record upstream revision, input hash, output hash, and skip-reason counts.
+- Generated rules must pass the fixture verifier before they are considered safe to ship.
 - Community rule examples live as fixtures and run through `cargo test`.
 - Root is not required; clipboard access belongs to the logged-in user session.
 - The MVP uses `pbpaste` and `pbcopy` for a small macOS adapter.

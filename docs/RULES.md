@@ -78,7 +78,16 @@ PlainLink keeps `.plainlink` as the runtime format, even when rules come from ex
 ```sh
 cargo run --bin plainlink-rules -- import-clearurls \
   --input clearurls-data.minify.json \
-  --output rules/generated/clearurls.plainlink
+  --output rules/generated/clearurls.plainlink \
+  --manifest rules/generated/clearurls.manifest \
+  --source-revision <upstream-sha>
 ```
 
-Generated third-party rules should not be committed by default until source licensing and attribution have been reviewed. See [RULE_SOURCES.md](RULE_SOURCES.md).
+Generated third-party rules should not be committed by default until source licensing and attribution have been reviewed. Before shipping generated rules, run the fixture corpus with native rules and again with generated rules merged in:
+
+```sh
+cargo run --bin plainlink-rules -- verify-fixtures
+cargo run --bin plainlink-rules -- verify-fixtures --rules rules/generated/clearurls.plainlink
+```
+
+See [RULE_SOURCES.md](RULE_SOURCES.md).
