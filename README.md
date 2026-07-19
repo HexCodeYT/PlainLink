@@ -69,6 +69,14 @@ scripts/test-macos-app.sh
 
 This creates `dist/PlainLink.app`.
 
+To build a local unsigned release zip:
+
+```sh
+scripts/package-macos-app.sh
+```
+
+This creates `dist/packages/PlainLink-<version>-macos-<arch>.zip` and a `.sha256` checksum.
+
 ## Project Layout
 
 ```text
@@ -94,6 +102,7 @@ docs/
 scripts/
   build-macos-app.sh  Build dist/PlainLink.app
   test-macos-app.sh   Build and smoke-test the app bundle
+  package-macos-app.sh Create an unsigned zip and checksum
 ```
 
 ## Contributing

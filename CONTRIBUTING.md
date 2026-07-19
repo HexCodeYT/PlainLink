@@ -15,6 +15,7 @@ For macOS menu bar app changes:
 
 ```sh
 scripts/test-macos-app.sh
+scripts/package-macos-app.sh
 ```
 
 ## Rule Contributions

@@ -16,6 +16,18 @@ The generated app lives at:
 dist/PlainLink.app
 ```
 
+Create an unsigned zip and checksum for testing:
+
+```sh
+scripts/package-macos-app.sh
+```
+
+Packages are written to:
+
+```text
+dist/packages/
+```
+
 The app is built with Swift/AppKit and Apple Command Line Tools. It embeds the release Rust CLI, then uses that CLI for all product actions:
 
 ```mermaid
