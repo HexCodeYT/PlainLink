@@ -10,6 +10,7 @@ RESOURCES_DIR="$CONTENTS_DIR/Resources"
 SWIFT_SOURCE="$ROOT_DIR/app/macos/PlainLinkMenu/Sources/PlainLinkMenu.swift"
 INFO_PLIST="$ROOT_DIR/packaging/macos/PlainLink.app/Contents/Info.plist"
 SWIFT_MODULE_CACHE="$ROOT_DIR/target/swift-module-cache"
+ICON_FILE="$RESOURCES_DIR/PlainLink.icns"
 
 if [ "$(uname -s)" != "Darwin" ]; then
   echo "PlainLink.app can only be built on macOS." >&2
@@ -32,6 +33,7 @@ rm -rf "$APP_DIR"
 mkdir -p "$MACOS_DIR" "$RESOURCES_DIR" "$SWIFT_MODULE_CACHE"
 
 cp "$INFO_PLIST" "$CONTENTS_DIR/Info.plist"
+"$ROOT_DIR/scripts/generate-macos-icon.sh" "$ICON_FILE"
 swiftc -O -framework AppKit -module-cache-path "$SWIFT_MODULE_CACHE" "$SWIFT_SOURCE" -o "$MACOS_DIR/PlainLinkMenu"
 cp "$ROOT_DIR/target/release/plainlink" "$MACOS_DIR/plainlink"
 

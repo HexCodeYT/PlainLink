@@ -4,6 +4,10 @@ PlainLink includes a native macOS menu bar shell built with Swift and AppKit. It
 
 The menu bar app is intentionally thin. The Rust CLI remains the engine for cleaning, LaunchAgent management, restore, and diagnostics.
 
+On first launch, the app shows a short explanation and lets the user enable cleaning from the dialog. The same copy is available later from `Getting Started` in the menu.
+
+The app icon is generated during `scripts/build-macos-app.sh` by `scripts/generate-macos-icon.sh`. The generated `PlainLink.icns` is bundled into `Contents/Resources` and referenced by `CFBundleIconFile`.
+
 ## Build
 
 ```sh
@@ -21,6 +25,7 @@ The app bundle contains:
 ```text
 Contents/MacOS/PlainLinkMenu   Native AppKit status bar app
 Contents/MacOS/plainlink       Release Rust CLI used by the app
+Contents/Resources/PlainLink.icns App icon
 Contents/Info.plist            LSUIElement menu bar app metadata
 ```
 
@@ -79,6 +84,7 @@ flowchart TB
 - Restore the last original URL.
 - Run doctor diagnostics.
 - Copy diagnostics to the clipboard.
+- Show getting-started guidance.
 - Open support and log folders.
 - Quit the menu bar app without stopping the LaunchAgent.
 
@@ -89,4 +95,4 @@ flowchart TB
 - `plainlink install` copies the embedded CLI to the stable user path before starting the watcher.
 - Pausing uses `plainlink agent uninstall`, which stops the watcher without deleting the installed binary.
 - Full uninstall remains available through the CLI with `plainlink uninstall`.
-- Signing and notarization are intentionally out of scope for the current MVP.
+- Signed and notarized release builds are documented in [RELEASE.md](RELEASE.md).

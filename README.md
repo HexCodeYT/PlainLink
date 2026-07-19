@@ -26,6 +26,7 @@ PlainLink is early MVP software.
 - Watches the macOS clipboard with `plainlink watch`.
 - Cleans the current clipboard once with `plainlink clean-clipboard`.
 - Provides a native macOS menu bar app built with Apple Command Line Tools.
+- Ships menu bar app icon generation and first-run guidance.
 - Installs PlainLink to a stable user path with `plainlink install`.
 - Installs PlainLink as a user LaunchAgent with `plainlink agent install`.
 - Compiles conservative external rule-source subsets with reproducible manifests.
@@ -98,6 +99,14 @@ cargo run --bin plainlink-rules -- verify-fixtures
 cargo run --bin plainlink-rules -- verify-fixtures --rules rules/generated/clearurls.plainlink
 ```
 
+To create a signed and notarized macOS release build, configure a Developer ID signing identity and notary profile, then run:
+
+```sh
+scripts/release-macos-app.sh
+```
+
+See [docs/RELEASE.md](docs/RELEASE.md).
+
 ## Project Layout
 
 ```text
@@ -120,12 +129,16 @@ docs/
   ARCHITECTURE.md System design and data flow
   RULES.md        Rule syntax and contribution guidance
   RULE_SOURCES.md External source compiler notes
+  RELEASE.md      Signed macOS release process
   MACOS.md        LaunchAgent notes
   MENUBAR.md      Native menu bar app notes
 scripts/
   build-macos-app.sh  Build dist/PlainLink.app
+  generate-macos-icon.sh Generate PlainLink.icns
   test-macos-app.sh   Build and smoke-test the app bundle
   package-macos-app.sh Create an unsigned zip and checksum
+  release-macos-app.sh Sign, notarize, staple, and package
+  publish-github-release.sh Publish a draft GitHub Release
 ```
 
 ## Contributing

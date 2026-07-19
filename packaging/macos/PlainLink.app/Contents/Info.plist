@@ -10,6 +10,8 @@
   <string>PlainLinkMenu</string>
   <key>CFBundleIdentifier</key>
   <string>au.hexcode.plainlink</string>
+  <key>CFBundleIconFile</key>
+  <string>PlainLink.icns</string>
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
   <key>CFBundleName</key>
