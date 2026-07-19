@@ -28,6 +28,7 @@ PlainLink is early MVP software.
 - Provides a native macOS menu bar app built with Apple Command Line Tools.
 - Installs PlainLink to a stable user path with `plainlink install`.
 - Installs PlainLink as a user LaunchAgent with `plainlink agent install`.
+- Compiles conservative external rule-source subsets with `plainlink-rules`.
 - Validates community rule behavior with fixture-backed tests.
 - Uses conservative rules that preserve unknown parameters by default.
 
@@ -41,6 +42,7 @@ cargo run -- clean-clipboard
 cargo run -- restore
 cargo run -- doctor
 cargo run -- agent status
+cargo run --bin plainlink-rules -- help
 ```
 
 Expected output:
@@ -92,11 +94,13 @@ src/
   main.rs         CLI entrypoint
 rules/
   base.plainlink  Default community rules
+  sources.toml    External rule source metadata
 tests/
   fixtures/       Rule behavior fixtures used by cargo test
 docs/
   ARCHITECTURE.md System design and data flow
   RULES.md        Rule syntax and contribution guidance
+  RULE_SOURCES.md External source compiler notes
   MACOS.md        LaunchAgent notes
   MENUBAR.md      Native menu bar app notes
 scripts/

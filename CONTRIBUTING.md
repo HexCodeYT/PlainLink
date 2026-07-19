@@ -55,6 +55,16 @@ Remove every unknown query parameter from every site.
 
 PlainLink preserves unknown parameters by default because invite links, signed downloads, password resets, checkout links, and calendar links often depend on query parameters.
 
+## External Rule Sources
+
+External rule importers are welcome, but keep generated third-party output out of normal rule PRs unless redistribution terms are clear.
+
+- Add source metadata to [rules/sources.toml](rules/sources.toml).
+- Add importer tests with small fixtures instead of downloading upstream lists during tests.
+- Preserve `.plainlink` as the generated runtime format.
+- Skip rules that cannot be represented safely.
+- Document license and attribution requirements in [docs/RULE_SOURCES.md](docs/RULE_SOURCES.md).
+
 ## Code Contributions
 
 - Keep the engine platform-independent.

@@ -23,6 +23,9 @@ flowchart TB
 
     subgraph Community["Community Rules"]
         Base["rules/base.plainlink"]
+        Sources["rules/sources.toml"]
+        Importers["plainlink-rules importers"]
+        Generated["generated .plainlink"]
         Fixtures["tests/fixtures"]
         Tests["Fixture-backed tests"]
     end
@@ -39,6 +42,9 @@ flowchart TB
     Restore --> State
     Restore --> Write
     Doctor --> Agent
+    Sources --> Importers
+    Importers --> Generated
+    Generated --> Match
     Base --> Match
     Fixtures --> Tests
     Tests --> Core
@@ -77,6 +83,7 @@ sequenceDiagram
 - The stable installer copies the binary before pointing LaunchAgent at it.
 - LaunchAgent commands install and control the user-level watcher process.
 - System-level clipboard cleaning is the product surface; browser extensions are not required for the core app.
+- External rule importers run at build or contributor time and emit `.plainlink`; the runtime does not understand external list formats.
 - Community rule examples live as fixtures and run through `cargo test`.
 - Root is not required; clipboard access belongs to the logged-in user session.
 - The MVP uses `pbpaste` and `pbcopy` for a small macOS adapter.

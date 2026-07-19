@@ -10,6 +10,7 @@
 - User LaunchAgent install/status/restart/uninstall.
 - Stable user install/uninstall and doctor checks.
 - Unsigned macOS release packaging.
+- Conservative ClearURLs rule importer.
 - Human-readable default rules.
 - Fixture-backed rule QA.
 - Contributor docs with Mermaid diagrams.
@@ -19,7 +20,8 @@
 - Add signed release builds.
 - Publish downloadable app artifacts from GitHub Actions.
 - Add clearer first-run onboarding inside the menu bar app.
-- Add optional remote ruleset updates with clear privacy controls.
+- Expand external source importers for EasyList/uBO removeparam and Firefox query stripping.
+- Add optional ruleset updates with clear privacy and licensing controls.
 
 ## Later
 
