@@ -63,6 +63,8 @@ External rule importers are welcome, but keep generated third-party output out o
 - Add importer tests with small fixtures instead of downloading upstream lists during tests.
 - Preserve `.plainlink` as the generated runtime format.
 - Skip rules that cannot be represented safely.
+- Write an import manifest with upstream revision, input hash, output hash, and skip stats.
+- Run `plainlink-rules verify-fixtures` with native rules and again with generated rules merged in.
 - Document license and attribution requirements in [docs/RULE_SOURCES.md](docs/RULE_SOURCES.md).
 
 ## Code Contributions

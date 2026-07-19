@@ -28,7 +28,8 @@ PlainLink is early MVP software.
 - Provides a native macOS menu bar app built with Apple Command Line Tools.
 - Installs PlainLink to a stable user path with `plainlink install`.
 - Installs PlainLink as a user LaunchAgent with `plainlink agent install`.
-- Compiles conservative external rule-source subsets with `plainlink-rules`.
+- Compiles conservative external rule-source subsets with reproducible manifests.
+- Verifies native and imported rule behavior with `plainlink-rules verify-fixtures`.
 - Validates community rule behavior with fixture-backed tests.
 - Uses conservative rules that preserve unknown parameters by default.
 
@@ -43,6 +44,7 @@ cargo run -- restore
 cargo run -- doctor
 cargo run -- agent status
 cargo run --bin plainlink-rules -- help
+cargo run --bin plainlink-rules -- verify-fixtures
 ```
 
 Expected output:
@@ -78,6 +80,23 @@ scripts/package-macos-app.sh
 ```
 
 This creates `dist/packages/PlainLink-<version>-macos-<arch>.zip` and a `.sha256` checksum.
+
+To compile a safe subset from an external source and write a manifest:
+
+```sh
+cargo run --bin plainlink-rules -- import-clearurls \
+  --input clearurls-data.minify.json \
+  --output rules/generated/clearurls.plainlink \
+  --manifest rules/generated/clearurls.manifest \
+  --source-revision <upstream-sha>
+```
+
+Before generated rules are considered for shipping, verify the native fixture corpus and then verify it again with the generated rules merged in:
+
+```sh
+cargo run --bin plainlink-rules -- verify-fixtures
+cargo run --bin plainlink-rules -- verify-fixtures --rules rules/generated/clearurls.plainlink
+```
 
 ## Project Layout
 
