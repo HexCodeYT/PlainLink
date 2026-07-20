@@ -50,7 +50,7 @@ dist/packages/PlainLink-<version>-macos-<arch>.zip
 dist/packages/PlainLink-<version>-macos-<arch>.zip.sha256
 ```
 
-The zip is unsigned and not notarized. It is meant for MVP testing and GitHub Actions artifacts.
+The zip is unsigned and not notarized. It is meant for technical testers and GitHub Actions artifacts, not regular-user distribution.
 
 Verify a downloaded package:
 
@@ -58,6 +58,8 @@ Verify a downloaded package:
 cd dist/packages
 shasum -a 256 -c PlainLink-<version>-macos-<arch>.zip.sha256
 ```
+
+Signed and notarized release builds are produced by `scripts/release-macos-app.sh` on a machine with Developer ID credentials. See [RELEASE.md](RELEASE.md).
 
 ## Runtime Flow
 
@@ -91,6 +93,8 @@ flowchart TB
 ## Design Notes
 
 - The app is a user-level status bar app with `LSUIElement`.
+- The first-run dialog is intentionally short and can enable cleaning directly.
+- The app icon is generated from reviewable Swift drawing code instead of a checked-in binary source asset.
 - The app shells out to the embedded `plainlink` binary instead of duplicating core logic.
 - `plainlink install` copies the embedded CLI to the stable user path before starting the watcher.
 - Pausing uses `plainlink agent uninstall`, which stops the watcher without deleting the installed binary.

@@ -9,6 +9,7 @@ cargo fmt --check
 cargo test
 cargo clippy --all-targets -- -D warnings
 cargo run -- inspect 'https://example.com/?utm_source=newsletter&id=42'
+cargo run --bin plainlink-rules -- verify-fixtures
 ```
 
 For macOS menu bar app changes:
@@ -17,6 +18,8 @@ For macOS menu bar app changes:
 scripts/test-macos-app.sh
 scripts/package-macos-app.sh
 ```
+
+`scripts/package-macos-app.sh` creates an unsigned testing zip. Use `scripts/release-macos-app.sh` only on a release machine with a Developer ID Application certificate and a configured notary profile.
 
 ## Rule Contributions
 
@@ -66,6 +69,15 @@ External rule importers are welcome, but keep generated third-party output out o
 - Write an import manifest with upstream revision, input hash, output hash, and skip stats.
 - Run `plainlink-rules verify-fixtures` with native rules and again with generated rules merged in.
 - Document license and attribution requirements in [docs/RULE_SOURCES.md](docs/RULE_SOURCES.md).
+
+## Release Contributions
+
+Release changes should keep developer-preview and regular-user distribution separate.
+
+- Unsigned zips are acceptable for testing and CI artifacts.
+- Regular-user downloads should be Developer ID-signed, notarized, stapled, and checksummed.
+- Do not imply that unsigned preview builds are notarized or Gatekeeper-clean.
+- Keep release notes in [docs/releases](docs/releases) aligned with the actual artifact status.
 
 ## Code Contributions
 

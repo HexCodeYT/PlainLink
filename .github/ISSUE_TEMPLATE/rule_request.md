@@ -11,4 +11,6 @@ labels: rule
 
 ## Why The Removed Parameters Are Tracking
 
+## Required Parameters That Must Stay
+
 ## Notes
