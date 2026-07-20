@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install Rust components
         run: rustup component add rustfmt clippy
@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install Rust components
         run: rustup component add rustfmt clippy
@@ -54,7 +54,7 @@ jobs:
         run: scripts/package-macos-app.sh
 
       - name: Upload app package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: plainlink-macos-app
           path: |

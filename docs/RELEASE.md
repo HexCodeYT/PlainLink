@@ -11,10 +11,17 @@ Current status: release automation exists, but this repository does not currentl
 Use this for technical testers:
 
 ```sh
-scripts/package-macos-app.sh
+PLAINLINK_RELEASE_VERSION=v0.1.0-preview.2 scripts/package-macos-app.sh
 ```
 
 This produces an unsigned zip and checksum in `dist/packages/`. macOS Gatekeeper will warn users because the app is not signed with a Developer ID certificate and is not notarized.
+
+Preview artifacts include the preview suffix in the filename, for example:
+
+```text
+dist/packages/PlainLink-0.1.0-preview.2-macos-arm64.zip
+dist/packages/PlainLink-0.1.0-preview.2-macos-arm64.zip.sha256
+```
 
 ### Signed Regular-User Release
 
@@ -69,6 +76,16 @@ The script:
 - verifies Gatekeeper assessment,
 - repackages the stapled app and writes a SHA-256 checksum.
 
+## Version Source
+
+Packaging scripts use `scripts/release-version.sh` as the single source of truth:
+
+1. `PLAINLINK_RELEASE_VERSION`, if set.
+2. The exact Git tag at `HEAD`, if one exists.
+3. The Cargo package version as a local development fallback.
+
+Use `PLAINLINK_RELEASE_VERSION` when building a preview artifact from a release branch or before checking out the preview tag. Use an exact tag checkout for final release builds.
+
 ## Publish GitHub Release
 
 After the signed zip and checksum exist, create and push the tag:
@@ -79,10 +96,19 @@ git push origin v0.1.0
 scripts/publish-github-release.sh v0.1.0
 ```
 
+For preview releases, the publish script expects preview-named artifacts and falls back to the base version notes if preview-specific notes do not exist:
+
+```sh
+PLAINLINK_RELEASE_VERSION=v0.1.0-preview.2 scripts/package-macos-app.sh
+git tag -a v0.1.0-preview.2 -m "PlainLink v0.1.0 Preview 2"
+git push origin v0.1.0-preview.2
+scripts/publish-github-release.sh v0.1.0-preview.2
+```
+
 The publish script creates a draft GitHub Release with:
 
-- `dist/packages/PlainLink-0.1.0-macos-<arch>.zip`
-- `dist/packages/PlainLink-0.1.0-macos-<arch>.zip.sha256`
-- release notes from `docs/releases/v0.1.0.md`
+- `dist/packages/PlainLink-<release-version>-macos-<arch>.zip`
+- `dist/packages/PlainLink-<release-version>-macos-<arch>.zip.sha256`
+- release notes from `docs/releases/<tag>.md`, or `docs/releases/v<base-version>.md` when preview-specific notes do not exist
 
 Review the draft release, confirm the checksum, confirm whether the artifact is signed/notarized or explicitly labeled unsigned preview, then publish it.

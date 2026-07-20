@@ -5,7 +5,7 @@ ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 APP_NAME="PlainLink"
 APP_DIR="$ROOT_DIR/dist/$APP_NAME.app"
 PACKAGE_DIR="$ROOT_DIR/dist/packages"
-VERSION=$(awk -F '=' '$1 ~ /^[[:space:]]*version[[:space:]]*$/ { gsub(/[ "]/, "", $2); print $2; exit }' "$ROOT_DIR/Cargo.toml")
+VERSION=$("$ROOT_DIR/scripts/release-version.sh")
 ARCH=$(uname -m)
 ARTIFACT_NAME="$APP_NAME-$VERSION-macos-$ARCH.zip"
 ZIP_PATH="$PACKAGE_DIR/$ARTIFACT_NAME"

@@ -86,6 +86,12 @@ This creates `dist/packages/PlainLink-<version>-macos-<arch>.zip` and a `.sha256
 
 This zip is for developer-preview testing. macOS Gatekeeper will warn because the app is not signed with a Developer ID certificate or notarized by Apple.
 
+For a preview-tagged artifact, pass the preview version explicitly:
+
+```sh
+PLAINLINK_RELEASE_VERSION=v0.1.0-preview.2 scripts/package-macos-app.sh
+```
+
 To compile a safe subset from an external source and write a manifest:
 
 ```sh
