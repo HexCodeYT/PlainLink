@@ -1,11 +1,13 @@
 # PlainLink Architecture
 
-PlainLink has two jobs: detect copied URLs and clean them without breaking useful links. The MVP keeps those jobs separate so contributors can improve rules and engine behavior without touching macOS UI or clipboard code.
+PlainLink has two jobs: detect copied URLs and clean them without breaking useful links. The current design keeps platform, core engine, community rules, and release packaging separate so contributors can improve one area without touching the others.
 
 ```mermaid
 flowchart TB
     subgraph Platform["Platform Adapter"]
         Menu["macOS menu bar app"]
+        Icon["Generated app icon"]
+        FirstRun["First-run guide"]
         Install["Stable installer"]
         Agent["LaunchAgent manager"]
         Watch["Clipboard watcher"]
@@ -32,6 +34,15 @@ flowchart TB
         Tests["cargo test"]
     end
 
+    subgraph Release["Release Packaging"]
+        Unsigned["Unsigned tester zip"]
+        Signed["Developer ID signed zip"]
+        Notary["Apple notarization"]
+        GitHub["GitHub Release"]
+    end
+
+    Menu --> Icon
+    Menu --> FirstRun
     Menu --> Install
     Menu --> Agent
     Menu --> Restore
@@ -53,6 +64,10 @@ flowchart TB
     Fixtures --> Gate
     Gate --> Tests
     Tests --> Core
+    Menu --> Unsigned
+    Unsigned --> Signed
+    Signed --> Notary
+    Notary --> GitHub
 ```
 
 ## Data Flow
@@ -82,6 +97,7 @@ sequenceDiagram
 
 - The Rust core owns URL cleaning, rule parsing, and tests.
 - The menu bar app owns user-facing controls and shells out to the CLI.
+- The menu bar app includes generated icon assets and first-run guidance.
 - The macOS adapter only reads and writes clipboard text.
 - Unknown parameters are kept by default.
 - The original URL is stored before PlainLink rewrites the clipboard.
@@ -92,8 +108,10 @@ sequenceDiagram
 - Import manifests record upstream revision, input hash, output hash, and skip-reason counts.
 - Generated rules must pass the fixture verifier before they are considered safe to ship.
 - Community rule examples live as fixtures and run through `cargo test`.
+- Unsigned app zips are for technical testers and CI artifacts.
+- Regular-user macOS releases require Developer ID signing, notarization, stapling, and checksum publication.
 - Root is not required; clipboard access belongs to the logged-in user session.
-- The MVP uses `pbpaste` and `pbcopy` for a small macOS adapter.
+- The current macOS watcher uses `pbpaste` and `pbcopy` for a small adapter.
 
 ## Future Shape
 

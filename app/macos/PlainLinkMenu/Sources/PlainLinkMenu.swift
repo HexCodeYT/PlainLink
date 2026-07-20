@@ -179,6 +179,7 @@ private final class PlainLinkCommand {
 private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
     private let runner = PlainLinkCommand()
+    private let firstRunKey = "PlainLinkHasSeenFirstRun"
     private var watcherStatus: WatcherStatus = .unknown("Checking status...")
     private var isWorking = false
     private var refreshTimer: Timer?
@@ -198,6 +199,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         configureStatusButton()
         rebuildMenu()
         refreshStatus()
+        showFirstRunIfNeeded()
 
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { [weak self] _ in
             self?.refreshStatus()
@@ -273,6 +275,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         menu.addItem(makeItem("Open Logs", action: #selector(openLogsFolder)))
         menu.addItem(NSMenuItem.separator())
 
+        menu.addItem(makeItem("Getting Started", action: #selector(showGettingStarted)))
         menu.addItem(makeItem("About PlainLink", action: #selector(showAbout)))
         menu.addItem(makeItem("Quit PlainLink", action: #selector(quit), keyEquivalent: "q"))
 
@@ -438,6 +441,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         showAlert(alert)
     }
 
+    @objc private func showGettingStarted() {
+        showFirstRunGuide()
+    }
+
     @objc private func quit() {
         NSApp.terminate(nil)
     }
@@ -501,6 +508,44 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         }
     }
 
+    private func showFirstRunIfNeeded() {
+        guard !UserDefaults.standard.bool(forKey: firstRunKey) else {
+            return
+        }
+
+        UserDefaults.standard.set(true, forKey: firstRunKey)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+            self?.showFirstRunGuide()
+        }
+    }
+
+    private func showFirstRunGuide() {
+        let alert = NSAlert()
+        alert.messageText = "PlainLink lives in your menu bar"
+        alert.informativeText = [
+            "Enable cleaning when you are ready.",
+            "",
+            "PlainLink runs locally, watches copied URLs, removes known tracking parameters, and keeps the last original link so you can restore it.",
+            "",
+            "You can pause cleaning, run doctor, and copy diagnostics from the menu."
+        ].joined(separator: "\n")
+        alert.alertStyle = .informational
+
+        let canEnable = watcherStatus != .running
+        alert.addButton(withTitle: canEnable ? "Enable Cleaning" : "OK")
+
+        if canEnable {
+            alert.addButton(withTitle: "Not Now")
+        }
+
+        let response = runAlert(alert)
+
+        if canEnable && response == .alertFirstButtonReturn {
+            toggleCleaning()
+        }
+    }
+
     private func showCommandResult(title: String, result: CommandResult) {
         let alert = NSAlert()
         alert.messageText = result.succeeded ? title : "\(title) failed"
@@ -528,8 +573,12 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     }
 
     private func showAlert(_ alert: NSAlert) {
+        _ = runAlert(alert)
+    }
+
+    private func runAlert(_ alert: NSAlert) -> NSApplication.ModalResponse {
         NSApp.activate(ignoringOtherApps: true)
-        alert.runModal()
+        return alert.runModal()
     }
 
     private func openUserFolder(_ components: [String]) {

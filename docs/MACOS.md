@@ -2,6 +2,12 @@
 
 PlainLink does not need to run as root. The clipboard belongs to the logged-in user session, so the right macOS shape is a user-level process or LaunchAgent.
 
+PlainLink currently supports macOS as a developer-preview app:
+
+- the CLI, clipboard watcher, LaunchAgent install flow, menu bar app, first-run guide, and app icon are implemented,
+- unsigned zip packaging is available for technical testers and CI artifacts,
+- signed and notarized release automation exists, but it requires a Developer ID certificate and notary credentials.
+
 ## Menu Bar App
 
 Build and smoke-test the native menu bar app:
@@ -16,7 +22,7 @@ The generated app lives at:
 dist/PlainLink.app
 ```
 
-Create an unsigned zip and checksum for testing:
+Create an unsigned zip and checksum for technical testing:
 
 ```sh
 scripts/package-macos-app.sh
@@ -27,6 +33,10 @@ Packages are written to:
 ```text
 dist/packages/
 ```
+
+The unsigned zip is not a regular-user release. Gatekeeper will warn when a user opens it.
+
+For a signed and notarized release build, see [RELEASE.md](RELEASE.md).
 
 The app is built with Swift/AppKit and Apple Command Line Tools. It embeds the release Rust CLI, then uses that CLI for all product actions:
 
@@ -56,7 +66,7 @@ dist/PlainLink.app/Contents/MacOS/PlainLinkMenu --smoke-test
 cargo run -- watch --interval-ms 500
 ```
 
-The MVP uses macOS `pbpaste` and `pbcopy` from a Rust watcher loop:
+The watcher uses macOS `pbpaste` and `pbcopy` from a Rust loop:
 
 ```mermaid
 flowchart LR
@@ -133,6 +143,7 @@ The menu bar app provides:
 - restore-last-original,
 - doctor diagnostics,
 - diagnostics copy,
+- first-run and getting-started guidance,
 - support and log folder shortcuts.
 
-Signing and notarization are not part of this MVP. See [MENUBAR.md](MENUBAR.md) for app internals.
+See [MENUBAR.md](MENUBAR.md) for app internals and [RELEASE.md](RELEASE.md) for signed/notarized distribution.
