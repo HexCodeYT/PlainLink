@@ -128,33 +128,13 @@ PlainLink is functional developer-preview software. It is ready for technical te
 ## Quick Start
 
 ```sh
+cargo fmt --check
 cargo test
-cargo run -- clean 'https://youtu.be/LYa_ReqRlcs?si=VC4qVB_EUC90uwbo'
-cargo run -- inspect 'https://example.com/read?utm_source=newsletter&id=42'
-cargo run -- clean-clipboard
-cargo run -- restore
+cargo clippy --all-targets -- -D warnings
 cargo run -- doctor
 cargo run -- agent status
 cargo run --bin plainlink-rules -- help
 cargo run --bin plainlink-rules -- verify-fixtures
-```
-
-Expected output:
-
-```text
-https://youtu.be/LYa_ReqRlcs
-```
-
-To watch the macOS clipboard:
-
-```sh
-cargo run -- watch --interval-ms 500
-```
-
-To install PlainLink to a stable user path and start the watcher:
-
-```sh
-cargo run -- install --interval-ms 500
 ```
 
 To build and smoke-test the native macOS menu bar app:
@@ -173,13 +153,34 @@ scripts/package-macos-app.sh
 
 This creates `dist/packages/PlainLink-<version>-macos-<arch>.zip` and a `.sha256` checksum.
 
-This zip is for developer-preview testing. macOS Gatekeeper will warn because the app is not signed with a Developer ID certificate or notarized by Apple.
-
 For a preview-tagged artifact, pass the preview version explicitly:
 
 ```sh
 PLAINLINK_RELEASE_VERSION=v0.1.0-preview.2 scripts/package-macos-app.sh
 ```
+
+To create a signed and notarized macOS release build, configure a Developer ID signing identity and notary profile, then run:
+
+```sh
+scripts/release-macos-app.sh
+```
+
+See [docs/RELEASE.md](docs/RELEASE.md).
+
+## Rule Contributions
+
+Found a tracking parameter PlainLink should remove? Open a rule request with:
+
+- the dirty URL,
+- the expected clean URL,
+- why the parameter is safe to remove,
+- any required parameters that must stay.
+
+Rules are intentionally readable. A rule PR should also include a fixture in `tests/fixtures/`.
+
+Start with [CONTRIBUTING.md](CONTRIBUTING.md), then read [docs/RULES.md](docs/RULES.md).
+
+## External Rule Sources
 
 To compile a safe subset from an external source and write a manifest:
 
@@ -198,14 +199,6 @@ cargo run --bin plainlink-rules -- verify-fixtures
 cargo run --bin plainlink-rules -- verify-fixtures --rules rules/generated/clearurls.plainlink
 ```
 
-To create a signed and notarized macOS release build, configure a Developer ID signing identity and notary profile, then run:
-
-```sh
-scripts/release-macos-app.sh
-```
-
-See [docs/RELEASE.md](docs/RELEASE.md).
-
 ## Distribution
 
 Current recommended distribution path:
@@ -215,6 +208,8 @@ Current recommended distribution path:
 - GitHub Release: publish only when the artifact is clearly labeled as an ad-hoc-signed, unnotarized preview, or when the Developer ID-signed/notarized release script has produced the final zip.
 
 Developer ID signing and notarization require Apple Developer Program membership. PlainLink does not currently assume that cost is worth paying before there is enough tester demand.
+
+See [docs/LAUNCH.md](docs/LAUNCH.md) for the discovery and first-launch checklist.
 
 ## Project Layout
 
@@ -239,6 +234,7 @@ docs/
   RULES.md        Rule syntax and contribution guidance
   RULE_SOURCES.md External source compiler notes
   RELEASE.md      Signed macOS release process
+  LAUNCH.md       Discovery and first-launch checklist
   MACOS.md        LaunchAgent notes
   MENUBAR.md      Native menu bar app notes
 scripts/
@@ -249,14 +245,3 @@ scripts/
   release-macos-app.sh Sign, notarize, staple, and package
   publish-github-release.sh Publish a draft GitHub Release
 ```
-
-## Contributing
-
-Rules are intentionally readable. A rule PR should include:
-
-- the dirty URL,
-- the expected cleaned URL,
-- why the parameter is safe to remove,
-- a fixture in `tests/fixtures/`.
-
-Start with [CONTRIBUTING.md](CONTRIBUTING.md), then read [docs/RULES.md](docs/RULES.md).
