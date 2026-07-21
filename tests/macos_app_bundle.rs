@@ -16,6 +16,8 @@ fn macos_menu_app_assets_are_wired() {
         fs::read_to_string("scripts/release-macos-app.sh").expect("release script should exist");
     let publish_script = fs::read_to_string("scripts/publish-github-release.sh")
         .expect("publish release script should exist");
+    let release_version =
+        fs::read_to_string("scripts/release-version.sh").expect("release version should exist");
     let release_docs = fs::read_to_string("docs/RELEASE.md").expect("release docs should exist");
     let release_notes =
         fs::read_to_string("docs/releases/v0.1.0.md").expect("v0.1.0 release notes should exist");
@@ -68,6 +70,7 @@ fn macos_menu_app_assets_are_wired() {
     assert!(release_script.contains("spctl --assess"));
     assert!(publish_script.contains("gh release create"));
     assert!(publish_script.contains("--verify-tag"));
+    assert!(release_version.contains("git -C \"$ROOT_DIR\" describe"));
     assert!(release_docs.contains("Developer ID Application"));
     assert!(release_docs.contains("notarytool store-credentials"));
     assert!(release_notes.contains("PlainLink v0.1.0"));

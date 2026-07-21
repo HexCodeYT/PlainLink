@@ -13,6 +13,7 @@
 - Stable user install/uninstall and doctor checks.
 - Unsigned macOS release packaging for testers and CI artifacts.
 - Signed/notarized release automation.
+- Tag-aware preview artifact naming.
 - Conservative ClearURLs rule importer.
 - Import manifests and fixture verification for generated rules.
 - Human-readable default rules.
