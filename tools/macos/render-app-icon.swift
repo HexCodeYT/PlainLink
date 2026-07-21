@@ -1,6 +1,5 @@
 import AppKit
 import Foundation
-import ImageIO
 
 struct IconVariant {
     let points: Int
@@ -152,25 +151,23 @@ func drawCheck(in rect: NSRect, size: CGFloat) {
 }
 
 func writePNG(image: NSImage, to url: URL) throws {
-    var proposedRect = NSRect(origin: .zero, size: image.size)
-
-    guard let cgImage = image.cgImage(forProposedRect: &proposedRect, context: nil, hints: nil) else {
+    guard let tiffData = image.tiffRepresentation else {
         throw NSError(domain: "PlainLinkIcon", code: 1, userInfo: [
-            NSLocalizedDescriptionKey: "could not create CGImage for \(url.lastPathComponent)"
+            NSLocalizedDescriptionKey: "could not create TIFF representation for \(url.lastPathComponent)"
         ])
     }
 
-    guard let destination = CGImageDestinationCreateWithURL(url as CFURL, "public.png" as CFString, 1, nil) else {
+    guard let bitmap = NSBitmapImageRep(data: tiffData) else {
         throw NSError(domain: "PlainLinkIcon", code: 2, userInfo: [
-            NSLocalizedDescriptionKey: "could not create PNG destination for \(url.lastPathComponent)"
+            NSLocalizedDescriptionKey: "could not create bitmap representation for \(url.lastPathComponent)"
         ])
     }
 
-    CGImageDestinationAddImage(destination, cgImage, nil)
-
-    if !CGImageDestinationFinalize(destination) {
+    guard let pngData = bitmap.representation(using: .png, properties: [:]) else {
         throw NSError(domain: "PlainLinkIcon", code: 3, userInfo: [
             NSLocalizedDescriptionKey: "could not encode \(url.lastPathComponent)"
         ])
     }
+
+    try pngData.write(to: url)
 }

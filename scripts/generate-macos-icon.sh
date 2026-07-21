@@ -26,6 +26,21 @@ rm -rf "$ICONSET_DIR"
 mkdir -p "$ICONSET_DIR" "$SWIFT_MODULE_CACHE" "$(dirname -- "$OUTPUT_PATH")"
 
 swift -module-cache-path "$SWIFT_MODULE_CACHE" "$ROOT_DIR/tools/macos/render-app-icon.swift" "$ICONSET_DIR"
-iconutil -c icns "$ICONSET_DIR" -o "$OUTPUT_PATH"
+
+if ! iconutil -c icns -o "$OUTPUT_PATH" "$ICONSET_DIR"; then
+  command -v sips >/dev/null 2>&1 || {
+    echo "sips is required for the fallback PlainLink.app icon build." >&2
+    exit 1
+  }
+
+  command -v tiff2icns >/dev/null 2>&1 || {
+    echo "tiff2icns is required for the fallback PlainLink.app icon build." >&2
+    exit 1
+  }
+
+  TIFF_PATH="$ICONSET_PARENT/PlainLink.tiff"
+  sips -s format tiff "$ICONSET_DIR/icon_512x512@2x.png" --out "$TIFF_PATH" >/dev/null
+  tiff2icns "$TIFF_PATH" "$OUTPUT_PATH"
+fi
 
 echo "Generated $OUTPUT_PATH"
