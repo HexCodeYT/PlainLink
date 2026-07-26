@@ -27,6 +27,11 @@ command -v swiftc >/dev/null 2>&1 || {
   exit 1
 }
 
+command -v codesign >/dev/null 2>&1 || {
+  echo "codesign is required to seal PlainLink.app." >&2
+  exit 1
+}
+
 cargo build --release --manifest-path "$ROOT_DIR/Cargo.toml"
 
 rm -rf "$APP_DIR"
@@ -38,5 +43,12 @@ swiftc -O -framework AppKit -module-cache-path "$SWIFT_MODULE_CACHE" "$SWIFT_SOU
 cp "$ROOT_DIR/target/release/plainlink" "$MACOS_DIR/plainlink"
 
 chmod 755 "$MACOS_DIR/PlainLinkMenu" "$MACOS_DIR/plainlink"
+
+# Replace linker-generated signatures and seal the complete bundle inside-out.
+# The ad-hoc identity keeps local preview builds structurally valid without
+# claiming Developer ID trust; release-macos-app.sh replaces it for releases.
+codesign --force --sign - "$MACOS_DIR/plainlink"
+codesign --force --sign - "$MACOS_DIR/PlainLinkMenu"
+codesign --force --sign - "$APP_DIR"
 
 echo "Built $APP_DIR"

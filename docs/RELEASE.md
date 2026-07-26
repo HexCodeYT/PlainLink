@@ -2,11 +2,11 @@
 
 PlainLink release builds need to be boring and verifiable. Regular users should receive a signed, notarized macOS app zip attached to a GitHub Release.
 
-Current status: release automation exists, but this repository does not currently have Developer ID credentials configured. Until that changes, any downloadable app artifact should be described as an unsigned developer preview.
+Current status: release automation exists, but this repository does not currently have Developer ID credentials configured. Until that changes, any downloadable app artifact should be described as an ad-hoc-signed, unnotarized developer preview.
 
 ## Release Modes
 
-### Unsigned Preview
+### Ad-hoc-signed Preview
 
 Use this for technical testers:
 
@@ -14,7 +14,7 @@ Use this for technical testers:
 PLAINLINK_RELEASE_VERSION=v0.1.0-preview.2 scripts/package-macos-app.sh
 ```
 
-This produces an unsigned zip and checksum in `dist/packages/`. macOS Gatekeeper will warn users because the app is not signed with a Developer ID certificate and is not notarized.
+This produces an ad-hoc-signed zip and checksum in `dist/packages/`. macOS Gatekeeper will warn users because the app is not signed with a Developer ID certificate and is not notarized.
 
 Preview artifacts include the preview suffix in the filename, for example:
 
@@ -111,4 +111,4 @@ The publish script creates a draft GitHub Release with:
 - `dist/packages/PlainLink-<release-version>-macos-<arch>.zip.sha256`
 - release notes from `docs/releases/<tag>.md`, or `docs/releases/v<base-version>.md` when preview-specific notes do not exist
 
-Review the draft release, confirm the checksum, confirm whether the artifact is signed/notarized or explicitly labeled unsigned preview, then publish it.
+Review the draft release, confirm the checksum, confirm whether the artifact is Developer ID-signed/notarized or explicitly labeled as an ad-hoc-signed, unnotarized preview, then publish it.
