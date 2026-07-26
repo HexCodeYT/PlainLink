@@ -32,7 +32,7 @@ PlainLink is the open-source, local-first URL-cleaning engine with transparent, 
 
 1. Open [GitHub Releases](https://github.com/HexCodeYT/PlainLink/releases) and download the ZIP for your Mac:
    - The file ending in `-macos-arm64.zip` for Apple silicon (M1, M2, M3, M4, or newer).
-   - The file ending in `-macos-x86_64.zip` for an Intel Mac.
+   - The file ending in `-macos-x86_64.zip` for an Intel Mac. (coming in near future)
 2. Open the ZIP and drag `PlainLink.app` into `/Applications`.
 3. Open Terminal and remove quarantine from this app only, then launch it:
 
