@@ -1,14 +1,14 @@
-# macOS Notes
+# macOS notes
 
 PlainLink does not need to run as root. The clipboard belongs to the logged-in user session, so the right macOS shape is a user-level process or LaunchAgent.
 
 PlainLink currently supports macOS as a developer-preview app:
 
-- the CLI, clipboard watcher, LaunchAgent install flow, menu bar app, first-run guide, and app icon are implemented,
+- the CLI, clipboard watcher, LaunchAgent install flow, menu bar app, automatic engine refresh, and app icon are implemented,
 - ad-hoc-signed, unnotarized zip packaging is available for technical testers and CI artifacts,
 - signed and notarized release automation exists, but it requires a Developer ID certificate and notary credentials.
 
-## Menu Bar App
+## Menu bar app
 
 Build and smoke-test the native menu bar app:
 
@@ -34,7 +34,14 @@ Packages are written to:
 dist/packages/
 ```
 
-The ad-hoc-signed, unnotarized zip is not a regular-user release. Gatekeeper will warn when a user opens it.
+The ad-hoc-signed, unnotarized zip is not a regular-user release. Gatekeeper may call the downloaded app damaged. Technical testers must remove quarantine from this app before opening it:
+
+```sh
+xattr -dr com.apple.quarantine /Applications/PlainLink.app
+open /Applications/PlainLink.app
+```
+
+After launch, the app refreshes the installed watcher from its bundled CLI unless the user previously selected **Pause Cleaning**.
 
 For a signed and notarized release build, see [RELEASE.md](RELEASE.md).
 
@@ -60,7 +67,7 @@ The app has a smoke-test mode that does not open the UI:
 dist/PlainLink.app/Contents/MacOS/PlainLinkMenu --smoke-test
 ```
 
-## Run Manually
+## Run manually
 
 ```sh
 cargo run -- watch --interval-ms 500
@@ -100,7 +107,7 @@ Clean the current clipboard once:
 cargo run -- clean-clipboard
 ```
 
-## LaunchAgent Example
+## LaunchAgent example
 
 Build the binary, then install the watcher as a user LaunchAgent:
 
@@ -133,7 +140,7 @@ PLAINLINK_BIN="$HOME/Library/Application Support/PlainLink/bin/plainlink"
 
 The generated plist is based on [packaging/macos/com.plainlink.agent.example.plist](../packaging/macos/com.plainlink.agent.example.plist). For lower-level control, use `plainlink agent help`.
 
-## App Controls
+## App controls
 
 The menu bar app provides:
 

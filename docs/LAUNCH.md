@@ -1,4 +1,4 @@
-# Launch Checklist
+# Launch checklist
 
 PlainLink's code is ready enough for technical testers. The launch bottleneck is discovery, understanding, and installation.
 
@@ -18,20 +18,20 @@ Secondary angles by audience:
 - Open-source communities: human-readable community rules.
 - Developers: reusable core through crates, npm, and containers.
 
-## Public Launch Blockers
+## Public launch blockers
 
-- [ ] Publish one public GitHub Release with one obvious macOS artifact and checksum.
-- [ ] Make sure the release clearly says whether the artifact is an ad-hoc-signed, unnotarized preview or a Developer ID-signed/notarized build.
-- [ ] Make the GitHub repository README the HN landing page, with the release download and source-build path visible above the fold.
+- [x] Publish a public GitHub preview with one obvious Apple silicon artifact and checksum.
+- [x] Label the artifact as ad-hoc signed and unnotarized.
+- [x] Use the GitHub README as the HN landing page, with install and source-build paths near the top.
 - [x] Document the exact `xattr` quarantine workaround required by the ad-hoc-signed preview.
 - [x] Record a 10 to 15 second demo showing copy, automatic cleanup, and paste.
 - [ ] Capture screenshots for the menu bar, inspection result, and restore flow.
 - [ ] Enable GitHub Discussions for rule requests, testing reports, ideas, and show-and-tell posts.
 - [x] Confirm the issue templates cover missing rules, false positives, app bugs, and feature requests.
 
-The public Releases page showed no published releases when this checklist was added on 2026-07-21. Do not promote a direct download until that is fixed.
+Preview 3 established the public download path. Preview 4 replaces it for launch because it refreshes an older installed watcher automatically.
 
-## Landing Page Requirements
+## Landing page requirements
 
 The first screen should say:
 
@@ -64,7 +64,7 @@ https://example.com/article?id=42
 
 Do not require an email address. Do not build a waitlist. Do not add telemetry to the app.
 
-## First 30 Days
+## First 30 days
 
 Target signal quality, not raw reach:
 
@@ -83,7 +83,7 @@ Track only public or aggregate signals:
 - external contributors,
 - direct tester responses.
 
-## Soft Launch
+## Soft launch
 
 Recruit 10 to 15 private testers who:
 
@@ -100,7 +100,7 @@ Run PlainLink for seven days and send me every URL it incorrectly changes or fai
 
 Use their examples to improve fixtures, screenshots, release notes, and launch copy.
 
-## Mac Community Launch
+## Mac community launch
 
 Start with `r/macapps` or a similarly focused native-Mac community.
 
@@ -154,7 +154,7 @@ The post and follow-up replies should explain:
 - how rule provenance works,
 - what feedback is most useful.
 
-## Technical Posts
+## Technical posts
 
 Publish these separately:
 
@@ -165,7 +165,7 @@ Publish these separately:
 - Designing clipboard automation that can safely undo itself.
 - Shipping ad-hoc-signed previews without pretending they are consumer releases.
 
-## Distribution Order
+## Distribution order
 
 Each channel creates another legitimate announcement:
 
@@ -180,7 +180,7 @@ Each channel creates another legitimate announcement:
 
 Reserve package names early, but do not publish empty or half-designed packages only to claim them.
 
-## Community Contribution Hook
+## Community contribution hook
 
 Lead with:
 

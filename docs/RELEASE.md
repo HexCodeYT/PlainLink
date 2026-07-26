@@ -1,17 +1,17 @@
-# Release Process
+# Release process
 
 PlainLink release builds need to be boring and verifiable. Regular users should receive a signed, notarized macOS app zip attached to a GitHub Release.
 
 Current status: release automation exists, but this repository does not currently have Developer ID credentials configured. Until that changes, any downloadable app artifact should be described as an ad-hoc-signed, unnotarized developer preview.
 
-## Release Modes
+## Release modes
 
-### Ad-hoc-signed Preview
+### Ad-hoc-signed preview
 
 Use this for technical testers:
 
 ```sh
-PLAINLINK_RELEASE_VERSION=v0.1.0-preview.2 scripts/package-macos-app.sh
+PLAINLINK_RELEASE_VERSION=v0.1.0-preview.4 scripts/package-macos-app.sh
 ```
 
 This produces an ad-hoc-signed zip and checksum in `dist/packages/`. macOS Gatekeeper will warn users because the app is not signed with a Developer ID certificate and is not notarized.
@@ -19,11 +19,11 @@ This produces an ad-hoc-signed zip and checksum in `dist/packages/`. macOS Gatek
 Preview artifacts include the preview suffix in the filename, for example:
 
 ```text
-dist/packages/PlainLink-0.1.0-preview.2-macos-arm64.zip
-dist/packages/PlainLink-0.1.0-preview.2-macos-arm64.zip.sha256
+dist/packages/PlainLink-0.1.0-preview.4-macos-arm64.zip
+dist/packages/PlainLink-0.1.0-preview.4-macos-arm64.zip.sha256
 ```
 
-### Signed Regular-User Release
+### Signed regular-user release
 
 Use this only when a release machine has Apple Developer Program credentials:
 
@@ -44,7 +44,7 @@ Signed releases require:
 
 Apple's notarization flow requires Developer ID signing, hardened runtime, secure timestamps, submission through `notarytool`, and stapling the accepted ticket before distribution.
 
-## Store Notary Credentials
+## Store notary credentials
 
 Create a keychain profile once on the release machine:
 
@@ -55,7 +55,7 @@ xcrun notarytool store-credentials plainlink-notary \
   --password app-specific-password
 ```
 
-## Build Signed And Notarized App
+## Build a signed and notarized app
 
 Set the Developer ID Application identity exactly as it appears in `security find-identity -v -p codesigning`:
 
@@ -76,7 +76,7 @@ The script:
 - verifies Gatekeeper assessment,
 - repackages the stapled app and writes a SHA-256 checksum.
 
-## Version Source
+## Version source
 
 Packaging scripts use `scripts/release-version.sh` as the single source of truth:
 
@@ -86,7 +86,7 @@ Packaging scripts use `scripts/release-version.sh` as the single source of truth
 
 Use `PLAINLINK_RELEASE_VERSION` when building a preview artifact from a release branch or before checking out the preview tag. Use an exact tag checkout for final release builds.
 
-## Publish GitHub Release
+## Publish a GitHub release
 
 After the signed zip and checksum exist, create and push the tag:
 
@@ -99,10 +99,10 @@ scripts/publish-github-release.sh v0.1.0
 For preview releases, the publish script expects preview-named artifacts and falls back to the base version notes if preview-specific notes do not exist:
 
 ```sh
-PLAINLINK_RELEASE_VERSION=v0.1.0-preview.2 scripts/package-macos-app.sh
-git tag -a v0.1.0-preview.2 -m "PlainLink v0.1.0 Preview 2"
-git push origin v0.1.0-preview.2
-scripts/publish-github-release.sh v0.1.0-preview.2
+PLAINLINK_RELEASE_VERSION=v0.1.0-preview.4 scripts/package-macos-app.sh
+git tag -a v0.1.0-preview.4 -m "PlainLink v0.1.0 Preview 4"
+git push origin v0.1.0-preview.4
+scripts/publish-github-release.sh v0.1.0-preview.4
 ```
 
 The publish script creates a draft GitHub Release with:
