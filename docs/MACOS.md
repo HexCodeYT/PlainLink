@@ -5,7 +5,7 @@ PlainLink does not need to run as root. The clipboard belongs to the logged-in u
 PlainLink currently supports macOS as a developer-preview app:
 
 - the CLI, clipboard watcher, LaunchAgent install flow, menu bar app, first-run guide, and app icon are implemented,
-- unsigned zip packaging is available for technical testers and CI artifacts,
+- ad-hoc-signed, unnotarized zip packaging is available for technical testers and CI artifacts,
 - signed and notarized release automation exists, but it requires a Developer ID certificate and notary credentials.
 
 ## Menu Bar App
@@ -22,7 +22,7 @@ The generated app lives at:
 dist/PlainLink.app
 ```
 
-Create an unsigned zip and checksum for technical testing:
+Create an ad-hoc-signed preview zip and checksum for technical testing:
 
 ```sh
 scripts/package-macos-app.sh
@@ -34,7 +34,7 @@ Packages are written to:
 dist/packages/
 ```
 
-The unsigned zip is not a regular-user release. Gatekeeper will warn when a user opens it.
+The ad-hoc-signed, unnotarized zip is not a regular-user release. Gatekeeper will warn when a user opens it.
 
 For a signed and notarized release build, see [RELEASE.md](RELEASE.md).
 

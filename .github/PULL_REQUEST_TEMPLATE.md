@@ -23,7 +23,7 @@ Fixture added/updated:
 
 Artifact status, if applicable:
 
-- [ ] unsigned developer preview
+- [ ] ad-hoc-signed, unnotarized developer preview
 - [ ] signed and notarized regular-user build
 
 Notes:

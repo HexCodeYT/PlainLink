@@ -11,7 +11,7 @@
 - Restore last original URL.
 - User LaunchAgent install/status/restart/uninstall.
 - Stable user install/uninstall and doctor checks.
-- Unsigned macOS release packaging for testers and CI artifacts.
+- Ad-hoc-signed, unnotarized macOS release packaging for testers and CI artifacts.
 - Signed/notarized release automation.
 - Tag-aware preview artifact naming.
 - Conservative ClearURLs rule importer.
@@ -22,9 +22,9 @@
 
 ## Current Distribution Status
 
-- Technical testers can build from source or use unsigned preview artifacts.
+- Technical testers can build from source or use ad-hoc-signed, unnotarized preview artifacts.
 - Regular-user distribution is blocked on Apple Developer Program membership, a Developer ID Application certificate, and notarization credentials.
-- A GitHub Release should be published only when the artifact is clearly labeled as an unsigned preview or when the signed/notarized zip exists.
+- A GitHub Release should be published only when the artifact is clearly labeled as an ad-hoc-signed, unnotarized preview or when the Developer ID-signed/notarized zip exists.
 
 ## Next
 

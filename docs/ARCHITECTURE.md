@@ -35,7 +35,7 @@ flowchart TB
     end
 
     subgraph Release["Release Packaging"]
-        Unsigned["Unsigned tester zip"]
+        Preview["Ad-hoc-signed tester zip"]
         Signed["Developer ID signed zip"]
         Notary["Apple notarization"]
         GitHub["GitHub Release"]
@@ -64,8 +64,8 @@ flowchart TB
     Fixtures --> Gate
     Gate --> Tests
     Tests --> Core
-    Menu --> Unsigned
-    Unsigned --> Signed
+    Menu --> Preview
+    Preview --> Signed
     Signed --> Notary
     Notary --> GitHub
 ```
@@ -108,7 +108,7 @@ sequenceDiagram
 - Import manifests record upstream revision, input hash, output hash, and skip-reason counts.
 - Generated rules must pass the fixture verifier before they are considered safe to ship.
 - Community rule examples live as fixtures and run through `cargo test`.
-- Unsigned app zips are for technical testers and CI artifacts.
+- Ad-hoc-signed, unnotarized app zips are for technical testers and CI artifacts.
 - Regular-user macOS releases require Developer ID signing, notarization, stapling, and checksum publication.
 - Root is not required; clipboard access belongs to the logged-in user session.
 - The current macOS watcher uses `pbpaste` and `pbcopy` for a small adapter.

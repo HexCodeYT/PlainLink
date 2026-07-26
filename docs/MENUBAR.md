@@ -50,7 +50,7 @@ dist/packages/PlainLink-<version>-macos-<arch>.zip
 dist/packages/PlainLink-<version>-macos-<arch>.zip.sha256
 ```
 
-The zip is unsigned and not notarized. It is meant for technical testers and GitHub Actions artifacts, not regular-user distribution.
+The zip is ad-hoc signed and not notarized. It is meant for technical testers and GitHub Actions artifacts, not regular-user distribution.
 
 Verify a downloaded package:
 

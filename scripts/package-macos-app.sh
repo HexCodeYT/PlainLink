@@ -26,6 +26,11 @@ command -v ditto >/dev/null 2>&1 || {
   exit 1
 }
 
+command -v codesign >/dev/null 2>&1 || {
+  echo "codesign is required to seal PlainLink.app." >&2
+  exit 1
+}
+
 command -v shasum >/dev/null 2>&1 || {
   echo "shasum is required to create package checksums." >&2
   exit 1
@@ -37,6 +42,8 @@ test -d "$APP_DIR" || {
   echo "missing app bundle: $APP_DIR" >&2
   exit 1
 }
+
+codesign --verify --deep --strict --verbose=2 "$APP_DIR"
 
 mkdir -p "$PACKAGE_DIR"
 rm -f "$ZIP_PATH" "$SHA_PATH"

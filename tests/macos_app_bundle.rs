@@ -55,10 +55,14 @@ fn macos_menu_app_assets_are_wired() {
     assert!(build_script.contains("scripts/generate-macos-icon.sh"));
     assert!(build_script.contains("swiftc"));
     assert!(build_script.contains("-module-cache-path"));
+    assert!(build_script.contains("codesign --force --sign -"));
     assert!(test_script.contains("--smoke-test"));
     assert!(test_script.contains("plutil -lint"));
     assert!(test_script.contains("PlainLink.icns"));
+    assert!(test_script.contains("codesign --verify --deep --strict"));
+    assert!(test_script.contains("icon_512x512.png"));
     assert!(package_script.contains("scripts/test-macos-app.sh"));
+    assert!(package_script.contains("codesign --verify --deep --strict"));
     assert!(package_script.contains("ditto -c -k --sequesterRsrc --keepParent"));
     assert!(package_script.contains("shasum -a 256"));
     assert!(package_script.contains("ARTIFACT_NAME="));
