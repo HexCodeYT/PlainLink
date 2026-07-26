@@ -43,7 +43,9 @@ fn macos_menu_app_assets_are_wired() {
 
     assert!(source.contains("--smoke-test"));
     assert!(source.contains("PlainLinkIntervalMilliseconds"));
-    assert!(source.contains("PlainLinkHasSeenFirstRun"));
+    assert!(source.contains("PlainLinkHasAutomaticallyEnabledWatcherV1"));
+    assert!(source.contains("enableCleaningOnFirstLaunch"));
+    assert!(source.contains("Cleaning started automatically."));
     assert!(source.contains("Getting Started"));
     assert!(source.contains("PlainLink lives in your menu bar"));
     assert!(plist.contains("<key>LSUIElement</key>"));

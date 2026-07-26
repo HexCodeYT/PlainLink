@@ -179,7 +179,7 @@ private final class PlainLinkCommand {
 private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
     private let runner = PlainLinkCommand()
-    private let firstRunKey = "PlainLinkHasSeenFirstRun"
+    private let automaticEnableKey = "PlainLinkHasAutomaticallyEnabledWatcherV1"
     private var watcherStatus: WatcherStatus = .unknown("Checking status...")
     private var isWorking = false
     private var refreshTimer: Timer?
@@ -199,7 +199,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         configureStatusButton()
         rebuildMenu()
         refreshStatus()
-        showFirstRunIfNeeded()
+        enableCleaningOnFirstLaunch()
 
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { [weak self] _ in
             self?.refreshStatus()
@@ -442,7 +442,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     }
 
     @objc private func showGettingStarted() {
-        showFirstRunGuide()
+        showGettingStartedGuide(cleaningEnabled: watcherStatus == .running)
     }
 
     @objc private func quit() {
@@ -508,42 +508,53 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         }
     }
 
-    private func showFirstRunIfNeeded() {
-        guard !UserDefaults.standard.bool(forKey: firstRunKey) else {
+    private func enableCleaningOnFirstLaunch() {
+        guard !UserDefaults.standard.bool(forKey: automaticEnableKey) else {
             return
         }
 
-        UserDefaults.standard.set(true, forKey: firstRunKey)
-
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
-            self?.showFirstRunGuide()
+            guard let self else {
+                return
+            }
+
+            self.runCommand(
+                title: "Start PlainLink",
+                arguments: ["install", "--interval-ms", "\(self.selectedInterval)"]
+            ) { [weak self] result in
+                guard let self else {
+                    return
+                }
+
+                if result.succeeded {
+                    UserDefaults.standard.set(true, forKey: self.automaticEnableKey)
+                    self.showGettingStartedGuide(cleaningEnabled: true)
+                } else {
+                    self.showCommandResult(title: "Could not start cleaning", result: result)
+                }
+            }
         }
     }
 
-    private func showFirstRunGuide() {
+    private func showGettingStartedGuide(cleaningEnabled: Bool) {
         let alert = NSAlert()
-        alert.messageText = "PlainLink lives in your menu bar"
-        alert.informativeText = [
-            "Enable cleaning when you are ready.",
-            "",
-            "PlainLink runs locally, watches copied URLs, removes known tracking parameters, and keeps the last original link so you can restore it.",
-            "",
-            "You can pause cleaning, run doctor, and copy diagnostics from the menu."
-        ].joined(separator: "\n")
+        alert.messageText = cleaningEnabled ? "PlainLink is cleaning copied links" : "PlainLink lives in your menu bar"
+        alert.informativeText = cleaningEnabled
+            ? [
+                "Cleaning started automatically.",
+                "",
+                "PlainLink runs locally, watches copied URLs, removes known tracking parameters, and keeps the last original link so you can restore it.",
+                "",
+                "You can pause cleaning, run doctor, and copy diagnostics from the menu."
+            ].joined(separator: "\n")
+            : [
+                "Cleaning is currently off. Choose Enable Cleaning from the PlainLink menu to start the watcher.",
+                "",
+                "PlainLink runs locally and preserves the last original link so you can restore it."
+            ].joined(separator: "\n")
         alert.alertStyle = .informational
-
-        let canEnable = watcherStatus != .running
-        alert.addButton(withTitle: canEnable ? "Enable Cleaning" : "OK")
-
-        if canEnable {
-            alert.addButton(withTitle: "Not Now")
-        }
-
-        let response = runAlert(alert)
-
-        if canEnable && response == .alertFirstButtonReturn {
-            toggleCleaning()
-        }
+        alert.addButton(withTitle: "OK")
+        showAlert(alert)
     }
 
     private func showCommandResult(title: String, result: CommandResult) {

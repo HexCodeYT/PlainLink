@@ -23,6 +23,7 @@ Secondary angles by audience:
 - [ ] Publish one public GitHub Release with one obvious macOS artifact and checksum.
 - [ ] Make sure the release clearly says whether the artifact is an ad-hoc-signed, unnotarized preview or a Developer ID-signed/notarized build.
 - [ ] Make the GitHub repository README the HN landing page, with the release download and source-build path visible above the fold.
+- [x] Document the exact `xattr` quarantine workaround required by the ad-hoc-signed preview.
 - [x] Record a 10 to 15 second demo showing copy, automatic cleanup, and paste.
 - [ ] Capture screenshots for the menu bar, inspection result, and restore flow.
 - [ ] Enable GitHub Discussions for rule requests, testing reports, ideas, and show-and-tell posts.
