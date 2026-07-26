@@ -16,11 +16,11 @@ PlainLink watches the clipboard and removes known tracking parameters before you
 
 PlainLink accepts links with or without `https://` and keeps the original form.
 
-## Install Preview 4
+## Install Preview 5
 
-Preview 4 is for technical testers with an Apple silicon Mac. It is ad-hoc signed but not notarized, so macOS may incorrectly say the app is damaged. A normal drag-and-drop install will not bypass that warning.
+Preview 5 is for technical testers with an Apple silicon Mac running macOS 11 or later. It is ad-hoc signed but not notarized, so macOS may incorrectly say the app is damaged. A normal drag-and-drop install will not bypass that warning.
 
-1. Download `PlainLink-0.1.0-preview.4-macos-arm64.zip` from [GitHub Releases](https://github.com/HexCodeYT/PlainLink/releases).
+1. Download `PlainLink-0.1.0-preview.5-macos-arm64.zip` from [GitHub Releases](https://github.com/HexCodeYT/PlainLink/releases).
 2. Unzip it and drag `PlainLink.app` into `/Applications`.
 3. Run these commands in Terminal:
 
@@ -68,10 +68,10 @@ open dist/PlainLink.app
 
 The smoke test builds the Rust CLI and native Swift/AppKit menu bar app, verifies the app bundle and its embedded binaries, and writes `dist/PlainLink.app`.
 
-To package a local Preview 4 ZIP:
+To package a local Preview 5 ZIP:
 
 ```sh
-PLAINLINK_RELEASE_VERSION=v0.1.0-preview.4 scripts/package-macos-app.sh
+PLAINLINK_RELEASE_VERSION=v0.1.0-preview.5 scripts/package-macos-app.sh
 ```
 
 ## Use the CLI

@@ -29,7 +29,7 @@ Secondary angles by audience:
 - [ ] Enable GitHub Discussions for rule requests, testing reports, ideas, and show-and-tell posts.
 - [x] Confirm the issue templates cover missing rules, false positives, app bugs, and feature requests.
 
-Preview 3 established the public download path. Preview 4 replaces it for launch because it refreshes an older installed watcher automatically.
+Preview 5 is the launch build. It includes Preview 4's automatic watcher refresh and explicitly targets macOS 11 in both bundled Mach-O executables.
 
 ## Landing page requirements
 
@@ -127,7 +127,7 @@ Ask for broken URLs and false positives. Do not ask for stars.
 Title:
 
 ```text
-Show HN: PlainLink - a local-first URL cleaner with a Rust core and native Mac app
+Show HN: PlainLink - a native Mac app that strips tracking from copied URLs
 ```
 
 Submit this repository URL, not a storefront or checkout page:
