@@ -1,0 +1,4 @@
+name = remove YouTube share token without requiring a URL scheme
+input = youtu.be/LYa_ReqRlcs?si=VC4qVB_EUC90uwbo
+expected = youtu.be/LYa_ReqRlcs
+removed = si
