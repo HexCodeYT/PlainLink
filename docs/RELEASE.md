@@ -11,7 +11,7 @@ Current status: release automation exists, but this repository does not currentl
 Use this for technical testers:
 
 ```sh
-PLAINLINK_RELEASE_VERSION=v0.1.0-preview.4 scripts/package-macos-app.sh
+PLAINLINK_RELEASE_VERSION=v0.1.0-preview.5 scripts/package-macos-app.sh
 ```
 
 This produces an ad-hoc-signed zip and checksum in `dist/packages/`. macOS Gatekeeper will warn users because the app is not signed with a Developer ID certificate and is not notarized.
@@ -19,8 +19,8 @@ This produces an ad-hoc-signed zip and checksum in `dist/packages/`. macOS Gatek
 Preview artifacts include the preview suffix in the filename, for example:
 
 ```text
-dist/packages/PlainLink-0.1.0-preview.4-macos-arm64.zip
-dist/packages/PlainLink-0.1.0-preview.4-macos-arm64.zip.sha256
+dist/packages/PlainLink-0.1.0-preview.5-macos-arm64.zip
+dist/packages/PlainLink-0.1.0-preview.5-macos-arm64.zip.sha256
 ```
 
 ### Signed regular-user release
@@ -99,10 +99,10 @@ scripts/publish-github-release.sh v0.1.0
 For preview releases, the publish script expects preview-named artifacts and falls back to the base version notes if preview-specific notes do not exist:
 
 ```sh
-PLAINLINK_RELEASE_VERSION=v0.1.0-preview.4 scripts/package-macos-app.sh
-git tag -a v0.1.0-preview.4 -m "PlainLink v0.1.0 Preview 4"
-git push origin v0.1.0-preview.4
-scripts/publish-github-release.sh v0.1.0-preview.4
+PLAINLINK_RELEASE_VERSION=v0.1.0-preview.5 scripts/package-macos-app.sh
+git tag -a v0.1.0-preview.5 -m "PlainLink v0.1.0 Preview 5"
+git push origin v0.1.0-preview.5
+scripts/publish-github-release.sh v0.1.0-preview.5
 ```
 
 The publish script creates a draft GitHub Release with:

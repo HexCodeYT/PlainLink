@@ -57,10 +57,14 @@ fn macos_menu_app_assets_are_wired() {
     assert!(build_script.contains("cargo build --release"));
     assert!(build_script.contains("scripts/generate-macos-icon.sh"));
     assert!(build_script.contains("swiftc"));
+    assert!(build_script.contains("MIN_MACOS_VERSION=\"11.0\""));
+    assert!(build_script.contains("-target \"$SWIFT_TARGET\""));
     assert!(build_script.contains("-module-cache-path"));
     assert!(build_script.contains("codesign --force --sign -"));
     assert!(test_script.contains("--smoke-test"));
     assert!(test_script.contains("plutil -lint"));
+    assert!(test_script.contains("vtool -show-build"));
+    assert!(test_script.contains("LSMinimumSystemVersion"));
     assert!(test_script.contains("PlainLink.icns"));
     assert!(test_script.contains("codesign --verify --deep --strict"));
     assert!(test_script.contains("icon_512x512.png"));
