@@ -179,7 +179,8 @@ private final class PlainLinkCommand {
 private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
     private let runner = PlainLinkCommand()
-    private let automaticEnableKey = "PlainLinkHasAutomaticallyEnabledWatcherV1"
+    private let cleaningPausedKey = "PlainLinkCleaningPausedByUser"
+    private let gettingStartedKey = "PlainLinkHasShownGettingStartedV2"
     private var watcherStatus: WatcherStatus = .unknown("Checking status...")
     private var isWorking = false
     private var refreshTimer: Timer?
@@ -199,7 +200,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         configureStatusButton()
         rebuildMenu()
         refreshStatus()
-        enableCleaningOnFirstLaunch()
+        syncCleaningOnLaunch()
 
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { [weak self] _ in
             self?.refreshStatus()
@@ -372,25 +373,25 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         switch watcherStatus {
         case .running:
             runCommand(title: "Pause Cleaning", arguments: ["agent", "uninstall"]) { [weak self] result in
-                self?.showResultIfFailed(title: "Pause Cleaning", result: result)
+                self?.finishWatcherCommand(title: "Pause Cleaning", result: result, pausedOnSuccess: true)
             }
         case .installed:
             runCommand(title: "Start Cleaning", arguments: ["agent", "restart"]) { [weak self] result in
-                self?.showResultIfFailed(title: "Start Cleaning", result: result)
+                self?.finishWatcherCommand(title: "Start Cleaning", result: result, pausedOnSuccess: false)
             }
         case .notInstalled, .unknown:
             runCommand(
                 title: "Enable Cleaning",
                 arguments: ["install", "--interval-ms", "\(selectedInterval)"]
             ) { [weak self] result in
-                self?.showResultIfFailed(title: "Enable Cleaning", result: result)
+                self?.finishWatcherCommand(title: "Enable Cleaning", result: result, pausedOnSuccess: false)
             }
         }
     }
 
     @objc private func restartWatcher() {
         runCommand(title: "Restart Watcher", arguments: ["agent", "restart"]) { [weak self] result in
-            self?.showResultIfFailed(title: "Restart Watcher", result: result)
+            self?.finishWatcherCommand(title: "Restart Watcher", result: result, pausedOnSuccess: false)
         }
     }
 
@@ -508,8 +509,20 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         }
     }
 
-    private func enableCleaningOnFirstLaunch() {
-        guard !UserDefaults.standard.bool(forKey: automaticEnableKey) else {
+    private func finishWatcherCommand(
+        title: String,
+        result: CommandResult,
+        pausedOnSuccess: Bool
+    ) {
+        if result.succeeded {
+            UserDefaults.standard.set(pausedOnSuccess, forKey: cleaningPausedKey)
+        }
+
+        showResultIfFailed(title: title, result: result)
+    }
+
+    private func syncCleaningOnLaunch() {
+        guard !UserDefaults.standard.bool(forKey: cleaningPausedKey) else {
             return
         }
 
@@ -527,10 +540,12 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
                 }
 
                 if result.succeeded {
-                    UserDefaults.standard.set(true, forKey: self.automaticEnableKey)
-                    self.showGettingStartedGuide(cleaningEnabled: true)
+                    if !UserDefaults.standard.bool(forKey: self.gettingStartedKey) {
+                        UserDefaults.standard.set(true, forKey: self.gettingStartedKey)
+                        self.showGettingStartedGuide(cleaningEnabled: true)
+                    }
                 } else {
-                    self.showCommandResult(title: "Could not start cleaning", result: result)
+                    self.showCommandResult(title: "Could not update or start cleaning", result: result)
                 }
             }
         }
