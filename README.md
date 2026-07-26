@@ -1,253 +1,135 @@
 # PlainLink
 
-Clean copied links before you share them.
+Clean tracking junk from copied links on macOS.
 
-PlainLink automatically removes known tracking parameters from URLs in your Mac clipboard. Everything happens locally.
+PlainLink watches the clipboard and removes known tracking parameters before you paste a URL. It runs on your Mac, makes no network requests, and leaves parameters alone unless a rule explicitly marks them as tracking.
 
-[Install the developer preview](#install-the-developer-preview) · [Build from source](#build-from-source) · [View source](https://github.com/HexCodeYT/PlainLink)
+[Download the developer preview](https://github.com/HexCodeYT/PlainLink/releases) · [Build from source](#build-from-source) · [Contribute a rule](#contributing-rules)
 
-- Free and open source
-- No accounts or analytics
-- No network requests
-- No browser extension
-- Unknown parameters are preserved
-- Restore the original URL anytime
+![PlainLink cleaning a copied URL before paste](docs/assets/plainlink-demo.gif)
 
-Runs locally. No accounts, network requests, analytics, or browser extension required.
+| Copied | Pasted |
+| --- | --- |
+| `youtube.com/watch?v=dQw4w9WgXcQ&si=share123&utm_source=copy` | `youtube.com/watch?v=dQw4w9WgXcQ` |
+| `amazon.com.au/dp/B08N5WRWNW?tag=affiliate-22&qid=1720000000&th=1` | `amazon.com.au/dp/B08N5WRWNW?th=1` |
+| `open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT?si=abc123` | `open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT` |
 
-![PlainLink demo showing a copied tracking URL cleaned before paste](docs/assets/plainlink-demo.gif)
+PlainLink accepts links with or without `https://` and keeps the original form.
 
-| Service | Copied URL | Cleaned URL |
-| --- | --- | --- |
-| YouTube | `youtube.com/watch?v=dQw4w9WgXcQ&si=share123&utm_source=copy` | `youtube.com/watch?v=dQw4w9WgXcQ` |
-| Amazon Australia | `amazon.com.au/dp/B08N5WRWNW?tag=affiliate-22&qid=1720000000&th=1` | `amazon.com.au/dp/B08N5WRWNW?th=1` |
-| Spotify | `open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT?si=abc123&utm_medium=share` | `open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT` |
+## Install Preview 4
 
-PlainLink is the open-source, local-first URL-cleaning engine with transparent, community-maintained rules. The native Mac utility is the first product surface; the Rust core and rule format are designed to stay portable.
+Preview 4 is for technical testers with an Apple silicon Mac. It is ad-hoc signed but not notarized, so macOS may incorrectly say the app is damaged. A normal drag-and-drop install will not bypass that warning.
 
-## Install the developer preview
-
-> [!WARNING]
-> PlainLink is early developer-preview software for technical testers. The app is ad-hoc signed, but it is not yet Developer ID-signed or notarized. macOS may say the downloaded app is damaged until its quarantine attribute is removed. Please expect rough edges and report incorrect URL changes.
-
-1. Open [GitHub Releases](https://github.com/HexCodeYT/PlainLink/releases) and download the ZIP for your Mac:
-   - The file ending in `-macos-arm64.zip` for Apple silicon (M1, M2, M3, M4, or newer).
-   - The file ending in `-macos-x86_64.zip` for an Intel Mac. (coming in near future)
-2. Open the ZIP and drag `PlainLink.app` into `/Applications`.
-3. Open Terminal and remove quarantine from this app only, then launch it:
+1. Download `PlainLink-0.1.0-preview.4-macos-arm64.zip` from [GitHub Releases](https://github.com/HexCodeYT/PlainLink/releases).
+2. Unzip it and drag `PlainLink.app` into `/Applications`.
+3. Run these commands in Terminal:
 
    ```sh
    xattr -dr com.apple.quarantine /Applications/PlainLink.app
    open /Applications/PlainLink.app
    ```
 
-4. PlainLink appears in the menu bar and starts watching copied URLs automatically.
+PlainLink appears in the menu bar, installs its clipboard watcher, and starts cleaning. When you replace the app with a newer build, the next launch updates the installed watcher too. If you choose **Pause Cleaning**, later launches respect that choice.
 
-The `xattr` command only removes macOS's downloaded-file quarantine marker from `PlainLink.app`. If you do not want to do that, use the source build below instead.
+The `xattr` command removes the downloaded-file quarantine marker from `PlainLink.app` only. If you would rather not do that, [build the app from source](#build-from-source). Developer ID signing and notarization are still pending.
 
-If the [Releases](https://github.com/HexCodeYT/PlainLink/releases) page has no ZIP for your Mac, use the source build below. Signing and notarisation are pending; the preview ZIP and its checksum will be clearly labelled on the release.
+### Check that it works
 
-### Build from source
+Copy this:
 
-Requires Rust and Apple Command Line Tools. This builds and launches the native menu bar app:
+```text
+youtube.com/watch?v=dQw4w9WgXcQ&si=share123&utm_source=copy
+```
+
+Wait half a second, then paste. You should get:
+
+```text
+youtube.com/watch?v=dQw4w9WgXcQ
+```
+
+If it does not change, open the PlainLink menu and choose **Run Doctor**. **Copy Diagnostics** puts the same report on your clipboard.
+
+## Safety model
+
+Rules list parameters that are safe to remove globally or on a particular domain. Unknown parameters stay in the URL. That matters for invite links, password resets, checkout sessions, signed URLs, playlists, timestamps, and anything else PlainLink does not understand.
+
+The menu includes **Restore Last Original** in case you need the untouched URL.
+
+PlainLink does not use an account, analytics, a server, or a browser extension. The app and its rules live in this repository.
+
+## Build from source
+
+You need Rust and Apple Command Line Tools.
 
 ```sh
-scripts/build-macos-app.sh
+scripts/test-macos-app.sh
 open dist/PlainLink.app
 ```
 
-For the CLI and test suite:
+The smoke test builds the Rust CLI and native Swift/AppKit menu bar app, verifies the app bundle and its embedded binaries, and writes `dist/PlainLink.app`.
+
+To package a local Preview 4 ZIP:
 
 ```sh
-cargo test
-cargo run -- clean 'https://youtu.be/LYa_ReqRlcs?si=VC4qVB_EUC90uwbo'
-cargo run -- inspect 'https://example.com/read?utm_source=newsletter&id=42'
+PLAINLINK_RELEASE_VERSION=v0.1.0-preview.4 scripts/package-macos-app.sh
 ```
 
-Expected clean output:
+## Use the CLI
 
-```text
-https://youtu.be/LYa_ReqRlcs
-```
-
-To watch the macOS clipboard without installing:
+Clean or inspect a URL:
 
 ```sh
-cargo run -- watch --interval-ms 500
+cargo run -- clean 'youtu.be/LYa_ReqRlcs?si=VC4qVB_EUC90uwbo'
+cargo run -- inspect 'example.com/read?utm_source=newsletter&id=42'
 ```
 
-To clean the current clipboard once or restore the last original URL:
+Work with the clipboard directly:
 
 ```sh
 cargo run -- clean-clipboard
 cargo run -- restore
+cargo run -- watch --interval-ms 500
 ```
 
-## What It Does
+Install the watcher and run diagnostics:
 
-- Cleans URLs from the CLI with `plainlink clean`.
-- Explains removed parameters with `plainlink inspect`.
-- Restores the last cleaned original URL with `plainlink restore`.
-- Watches the macOS clipboard with `plainlink watch`.
-- Cleans the current clipboard once with `plainlink clean-clipboard`.
-- Provides a native macOS menu bar app built with Apple Command Line Tools.
-- Installs PlainLink to a stable user path with `plainlink install`.
-- Installs PlainLink as a user LaunchAgent with `plainlink agent install`.
-- Compiles conservative external rule-source subsets with reproducible manifests.
-- Verifies native and imported rule behavior with `plainlink-rules verify-fixtures`.
-- Uses conservative rules that preserve unknown parameters by default.
+```sh
+cargo run -- install --interval-ms 500
+cargo run -- doctor
+cargo run -- agent status
+```
 
-## How It Works
+## How it fits together
 
 ```mermaid
 flowchart LR
-    Copy["User copies a URL"] --> Clipboard["macOS clipboard"]
-    Menu["PlainLink menu bar app"] --> Watcher["plainlink watch"]
-    Clipboard --> Watcher
+    Clipboard["macOS clipboard"] --> Watcher["Rust watcher"]
+    Menu["Swift/AppKit menu app"] --> Watcher
     Watcher --> Engine["plainlink-core"]
-    Engine --> Rules["rules/base.plainlink"]
-    Rules --> Engine
-    Engine --> Cleaned["Clean URL"]
-    Cleaned --> Clipboard
+    Rules["Readable rules"] --> Engine
+    Engine --> Clipboard
 ```
 
-## Current Status
+The menu app owns status and controls. The Rust CLI handles cleaning, watcher installation, diagnostics, and restore. `rules/base.plainlink` contains the bundled rules, and the fixture files under `tests/fixtures/` lock in expected behavior.
 
-PlainLink is functional developer-preview software. It is ready for technical testers who are comfortable with source builds or ad-hoc-signed, unnotarized macOS apps, but it is not yet a regular-user notarized release.
-
-- Cleans URLs from the CLI with `plainlink clean`.
-- Explains removed parameters with `plainlink inspect`.
-- Restores the last cleaned original URL with `plainlink restore`.
-- Watches the macOS clipboard with `plainlink watch`.
-- Cleans the current clipboard once with `plainlink clean-clipboard`.
-- Provides a native macOS menu bar app built with Apple Command Line Tools.
-- Ships menu bar app icon generation and first-run guidance.
-- Installs PlainLink to a stable user path with `plainlink install`.
-- Installs PlainLink as a user LaunchAgent with `plainlink agent install`.
-- Compiles conservative external rule-source subsets with reproducible manifests.
-- Verifies native and imported rule behavior with `plainlink-rules verify-fixtures`.
-- Builds ad-hoc-signed, unnotarized macOS zip packages for testing and CI artifacts.
-- Has signed/notarized release automation ready, but no Developer ID certificate is configured.
-- Validates community rule behavior with fixture-backed tests.
-- Uses conservative rules that preserve unknown parameters by default.
-
-## Quick Start
+## Development checks
 
 ```sh
 cargo fmt --check
 cargo test
 cargo clippy --all-targets -- -D warnings
-cargo run -- doctor
-cargo run -- agent status
-cargo run --bin plainlink-rules -- help
 cargo run --bin plainlink-rules -- verify-fixtures
-```
-
-To build and smoke-test the native macOS menu bar app:
-
-```sh
 scripts/test-macos-app.sh
 ```
 
-This creates `dist/PlainLink.app`.
+Release and architecture notes are in [`docs/RELEASE.md`](docs/RELEASE.md) and [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
-To build a local ad-hoc-signed preview zip:
+## Contributing rules
 
-```sh
-scripts/package-macos-app.sh
-```
+Open a rule request with the copied URL, the expected result, and an explanation of why the parameter is safe to remove. Mention any parameters that must stay.
 
-This creates `dist/packages/PlainLink-<version>-macos-<arch>.zip` and a `.sha256` checksum.
+A rule pull request should include a fixture under `tests/fixtures/`. See [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`docs/RULES.md`](docs/RULES.md).
 
-For a preview-tagged artifact, pass the preview version explicitly:
+## License
 
-```sh
-PLAINLINK_RELEASE_VERSION=v0.1.0-preview.2 scripts/package-macos-app.sh
-```
-
-To create a signed and notarized macOS release build, configure a Developer ID signing identity and notary profile, then run:
-
-```sh
-scripts/release-macos-app.sh
-```
-
-See [docs/RELEASE.md](docs/RELEASE.md).
-
-## Rule Contributions
-
-Found a tracking parameter PlainLink should remove? Open a rule request with:
-
-- the dirty URL,
-- the expected clean URL,
-- why the parameter is safe to remove,
-- any required parameters that must stay.
-
-Rules are intentionally readable. A rule PR should also include a fixture in `tests/fixtures/`.
-
-Start with [CONTRIBUTING.md](CONTRIBUTING.md), then read [docs/RULES.md](docs/RULES.md).
-
-## External Rule Sources
-
-To compile a safe subset from an external source and write a manifest:
-
-```sh
-cargo run --bin plainlink-rules -- import-clearurls \
-  --input clearurls-data.minify.json \
-  --output rules/generated/clearurls.plainlink \
-  --manifest rules/generated/clearurls.manifest \
-  --source-revision <upstream-sha>
-```
-
-Before generated rules are considered for shipping, verify the native fixture corpus and then verify it again with the generated rules merged in:
-
-```sh
-cargo run --bin plainlink-rules -- verify-fixtures
-cargo run --bin plainlink-rules -- verify-fixtures --rules rules/generated/clearurls.plainlink
-```
-
-## Distribution
-
-Current recommended distribution path:
-
-- Technical testers: build from source or use an explicitly ad-hoc-signed, unnotarized preview zip.
-- Regular users: wait for a Developer ID-signed and notarized release.
-- GitHub Release: publish only when the artifact is clearly labeled as an ad-hoc-signed, unnotarized preview, or when the Developer ID-signed/notarized release script has produced the final zip.
-
-Developer ID signing and notarization require Apple Developer Program membership. PlainLink does not currently assume that cost is worth paying before there is enough tester demand.
-
-See [docs/LAUNCH.md](docs/LAUNCH.md) for the discovery and first-launch checklist.
-
-## Project Layout
-
-```text
-app/
-  macos/PlainLinkMenu  Swift/AppKit menu bar app
-src/
-  agent.rs        macOS LaunchAgent management
-  cleaner.rs      URL cleaning engine
-  install.rs      Stable user install and doctor checks
-  rules.rs        PlainLink rule parser and matcher
-  clipboard.rs    macOS clipboard watcher adapter
-  state.rs        Last-cleaned URL restore state
-  main.rs         CLI entrypoint
-rules/
-  base.plainlink  Default community rules
-  sources.toml    External rule source metadata
-tests/
-  fixtures/       Rule behavior fixtures used by cargo test
-docs/
-  ARCHITECTURE.md System design and data flow
-  RULES.md        Rule syntax and contribution guidance
-  RULE_SOURCES.md External source compiler notes
-  RELEASE.md      Signed macOS release process
-  LAUNCH.md       Discovery and first-launch checklist
-  MACOS.md        LaunchAgent notes
-  MENUBAR.md      Native menu bar app notes
-scripts/
-  build-macos-app.sh  Build dist/PlainLink.app
-  generate-macos-icon.sh Generate PlainLink.icns
-  test-macos-app.sh   Build and smoke-test the app bundle
-  package-macos-app.sh Create an ad-hoc-signed preview zip and checksum
-  release-macos-app.sh Sign, notarize, staple, and package
-  publish-github-release.sh Publish a draft GitHub Release
-```
+PlainLink is available under the [MIT License](LICENSE).
