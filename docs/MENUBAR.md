@@ -93,7 +93,8 @@ flowchart TB
 ## Design Notes
 
 - The app is a user-level status bar app with `LSUIElement`.
-- The first-run dialog is intentionally short and can enable cleaning directly.
+- On first launch, the app installs and starts the watcher automatically, then confirms that cleaning is active.
+- After a user pauses cleaning, later app launches preserve that choice; cleaning can be re-enabled from the menu.
 - The app icon is generated from reviewable Swift drawing code instead of a checked-in binary source asset.
 - The app shells out to the embedded `plainlink` binary instead of duplicating core logic.
 - `plainlink install` copies the embedded CLI to the stable user path before starting the watcher.

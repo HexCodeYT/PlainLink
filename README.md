@@ -28,16 +28,22 @@ PlainLink is the open-source, local-first URL-cleaning engine with transparent, 
 ## Install the developer preview
 
 > [!WARNING]
-> PlainLink is early developer-preview software for technical testers. The app is ad-hoc signed, but it is not yet Developer ID-signed or notarized. macOS Gatekeeper will warn on first launch. Please expect rough edges and report incorrect URL changes.
+> PlainLink is early developer-preview software for technical testers. The app is ad-hoc signed, but it is not yet Developer ID-signed or notarized. macOS may say the downloaded app is damaged until its quarantine attribute is removed. Please expect rough edges and report incorrect URL changes.
 
 1. Open [GitHub Releases](https://github.com/HexCodeYT/PlainLink/releases) and download the ZIP for your Mac:
    - The file ending in `-macos-arm64.zip` for Apple silicon (M1, M2, M3, M4, or newer).
    - The file ending in `-macos-x86_64.zip` for an Intel Mac.
 2. Open the ZIP and drag `PlainLink.app` into `/Applications`.
-3. In Finder, open **Applications**, Control-click `PlainLink`, choose **Open**, then choose **Open** again.
-4. PlainLink appears in the menu bar and starts watching copied URLs.
+3. Open Terminal and remove quarantine from this app only, then launch it:
 
-If macOS does not show the second **Open** button, try launching PlainLink once, then go to **System Settings → Privacy & Security**, find the blocked-app message, and choose **Open Anyway**.
+   ```sh
+   xattr -dr com.apple.quarantine /Applications/PlainLink.app
+   open /Applications/PlainLink.app
+   ```
+
+4. PlainLink appears in the menu bar and starts watching copied URLs automatically.
+
+The `xattr` command only removes macOS's downloaded-file quarantine marker from `PlainLink.app`. If you do not want to do that, use the source build below instead.
 
 If the [Releases](https://github.com/HexCodeYT/PlainLink/releases) page has no ZIP for your Mac, use the source build below. Signing and notarisation are pending; the preview ZIP and its checksum will be clearly labelled on the release.
 
